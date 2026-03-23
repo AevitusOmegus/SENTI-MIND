@@ -25,6 +25,10 @@ When you type a sentence into SentiMind, it goes through a "pipeline" (a set of 
 ## 🚀 How To Set It Up (Step-by-Step for Beginners)
 
 ### 1. Setting up the Backend (The Brain)
+
+> [!CAUTION]
+> **Python 3.11 or 3.12 required.** Python 3.14 is currently NOT supported by our core Machine Learning dependencies.
+
 Open your terminal and type these commands exactly:
 
 1. Go into the backend folder:
