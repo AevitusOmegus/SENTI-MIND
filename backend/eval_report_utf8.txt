@@ -1,0 +1,21 @@
+﻿Loading data from C:\Users\mushtaq\Documents\sentimind\backend\data\Combined Data.csv...
+Evaluating on 200 samples...
+
+--- Accuracy Report ---
+Overall Accuracy: 0.8800
+
+Classification Report:
+                      precision    recall  f1-score   support
+
+             Anxiety       0.92      1.00      0.96        11
+             Bipolar       0.92      0.92      0.92        12
+          Depression       0.86      0.83      0.84        69
+              Normal       0.94      0.97      0.95        61
+Personality disorder       1.00      1.00      1.00         6
+              Stress       0.90      0.69      0.78        13
+            Suicidal       0.74      0.82      0.78        28
+
+            accuracy                           0.88       200
+           macro avg       0.90      0.89      0.89       200
+        weighted avg       0.88      0.88      0.88       200
+

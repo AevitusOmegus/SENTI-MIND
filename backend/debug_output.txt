@@ -1,0 +1,23 @@
+--- STARTING DEBUG PIPELINE ---
+Input text: I feel so hopeless 😭. I want to end it all.
+
+L0: Cleaning text...
+L0 OK: I feel so hopeless heavy sobbing . I want to end it all.
+
+L1: Detecting emotions...
+L1 OK: [{'label': 'sadness', 'score': 0.9986775517463684}, {'label': 'fear', 'score': 0.0005360710201784968}]
+
+L2: Clinical Classifier...
+L2 OK: Suicidal
+
+L3: Context Mapper (NER)...
+L3 OK: Found 0 entities
+
+L4: Risk Engine...
+L4 OK: Level=high
+
+L5: LLM (Gemini)...
+L5 OK: insight length=897
+L5 Preview: **Insight:** Your words carry immense emotional weight, reflecting a profound sense of pain and exha...
+
+--- PIPELINE SUCCESSFUL ---

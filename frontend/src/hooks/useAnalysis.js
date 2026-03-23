@@ -1,0 +1,28 @@
+import { useState, useCallback } from "react";
+import { analyzeText } from "../services/analysisService";
+
+export function useAnalysis() {
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const analyze = useCallback(async (text) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await analyzeText(text);
+      setResult(data);
+    } catch (err) {
+      setError(err?.response?.data?.detail ?? "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const reset = useCallback(() => {
+    setResult(null);
+    setError(null);
+  }, []);
+
+  return { result, loading, error, analyze, reset };
+}

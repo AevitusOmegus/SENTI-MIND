@@ -1,0 +1,143 @@
+import re
+
+EMOJI_MAP: dict[str, str] = {
+    "😀": "grinning",
+    "😁": "beaming with joy",
+    "😂": "laughing with tears",
+    "🤣": "rolling on floor laughing",
+    "😃": "big smile",
+    "😄": "grinning",
+    "😅": "nervous laughter",
+    "😆": "laughing",
+    "😉": "winking",
+    "😊": "smiling warmly",
+    "😋": "savoring food",
+    "😎": "cool",
+    "😍": "heart eyes",
+    "🥰": "loving",
+    "😘": "kissing",
+    "😗": "kissing",
+    "🤩": "starstruck",
+    "🥳": "celebrating",
+    "😐": "expressionless",
+    "😑": "blank face",
+    "😶": "speechless",
+    "😏": "smirking",
+    "😒": "unamused",
+    "🙄": "rolling eyes",
+    "😬": "grimacing",
+    "🤐": "zipped mouth",
+    "🤨": "skeptical",
+    "😕": "confused",
+    "😟": "worried",
+    "🙁": "slightly frowning",
+    "☹️": "frowning",
+    "😮": "surprised",
+    "😯": "hushed",
+    "😲": "astonished",
+    "😳": "flushed",
+    "🥺": "pleading",
+    "😦": "frowning open mouth",
+    "😧": "anguished",
+    "😨": "fearful",
+    "😰": "anxious with sweat",
+    "😥": "sad but relieved",
+    "😢": "crying",
+    "😭": "heavy sobbing",
+    "😱": "screaming in fear",
+    "😖": "confounded",
+    "😣": "persevering",
+    "😞": "disappointed",
+    "😓": "downcast with sweat",
+    "😩": "weary",
+    "😫": "tired",
+    "🥱": "yawning",
+    "😤": "huffing in anger",
+    "😡": "enraged",
+    "😠": "angry",
+    "🤬": "face with symbols over mouth",
+    "😈": "smiling devil",
+    "👿": "angry devil",
+    "💀": "skull death",
+    "☠️": "skull and crossbones",
+    "💔": "broken heart",
+    "❤️": "red heart love",
+    "🖤": "black heart",
+    "💜": "purple heart",
+    "💙": "blue heart",
+    "💚": "green heart",
+    "💛": "yellow heart",
+    "🤍": "white heart",
+    "🤎": "brown heart",
+    "❣️": "heart exclamation",
+    "💕": "two hearts",
+    "💞": "revolving hearts",
+    "💓": "beating heart",
+    "💗": "growing heart",
+    "💖": "sparkling heart",
+    "💘": "heart with arrow",
+    "💝": "heart with ribbon",
+    "💟": "heart decoration",
+    "😴": "sleeping",
+    "🤒": "ill",
+    "🤕": "injured",
+    "🤢": "nauseated",
+    "🤮": "vomiting",
+    "🤧": "sneezing",
+    "🥵": "hot overheated",
+    "🥶": "cold freezing",
+    "🥴": "woozy",
+    "😵": "dizzy",
+    "🤯": "mind blown",
+    "🤫": "shushing",
+    "🤭": "hand over mouth",
+    "🧐": "monocle face",
+    "🤓": "nerd face",
+    "😇": "smiling with halo",
+    "🥲": "smiling with tear",
+    "🤗": "hugging",
+    "🫠": "melting",
+    "🫥": "dotted face",
+    "🫤": "diagonal mouth",
+    "🫡": "saluting",
+    "🫣": "peeking eye",
+    "🫢": "open mouth shocked",
+    "🫨": "shaking",
+    "🙃": "upside down smiling",
+    "🫀": "anatomical heart",
+    "🧠": "brain",
+    "🆘": "SOS emergency",
+    "⚠️": "warning",
+    "🚨": "alert",
+    "🔥": "fire intense",
+    "💣": "bomb explosive",
+    "🪓": "axe",
+    "🔪": "knife",
+    "⚡": "lightning",
+    "🌧️": "rainy sad",
+    "🌪️": "tornado chaos",
+    "🌊": "wave overwhelming",
+}
+
+_URL_RE = re.compile(r"https?://\S+|www\.\S+")
+_MULTI_SPACE_RE = re.compile(r"\s{2,}")
+
+
+def clean_text(raw: str) -> tuple[str, list[str]]:
+    """Replace emojis with text equivalents, strip URLs, and normalise whitespace."""
+    emoji_tokens: list[str] = []
+
+    result = []
+    for ch in raw:
+        if ch in EMOJI_MAP:
+            replacement = EMOJI_MAP[ch]
+            emoji_tokens.append(replacement)
+            result.append(f" {replacement} ")
+        else:
+            result.append(ch)
+    text = "".join(result)
+
+    text = _URL_RE.sub("", text)
+    text = _MULTI_SPACE_RE.sub(" ", text).strip()
+
+    return text, emoji_tokens

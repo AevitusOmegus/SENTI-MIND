@@ -1,0 +1,107 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-canvas:   #F1F8E9;
+  --color-surface:  rgba(255, 255, 255, 0.72);
+  --color-border:   rgba(165, 214, 167, 0.35);
+  --color-primary:  #81C784;
+  --color-forest:   #2E7D32;
+  --color-indigo:   #7986CB;
+  --color-amber:    #FFD54F;
+  --color-rose:     #F06292;
+  --color-text:     #1B5E20;
+  --color-muted:    #4CAF50;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+  background-image:
+    radial-gradient(ellipse at 15% 10%, rgba(165, 214, 167, 0.28) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(179, 229, 252, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(241, 248, 233, 0.8) 0%, transparent 80%);
+  background-attachment: fixed;
+  color: var(--color-text);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(165, 214, 167, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(46, 125, 50, 0.10);
+}
+
+.glass-card-deep {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(165, 214, 167, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(46, 125, 50, 0.13);
+}
+
+/* Sage button */
+.btn-sage {
+  background: linear-gradient(135deg, #81C784 0%, #4CAF50 100%);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.35);
+}
+.btn-sage:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.45);
+}
+.btn-sage:active:not(:disabled) {
+  transform: translateY(0);
+}
+.btn-sage:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Sentiment pulse orb */
+.pulse-orb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: orb-pulse 2.5s ease-in-out infinite;
+}
+@keyframes orb-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  50%       { box-shadow: 0 0 0 6px transparent;  opacity: 0.7; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(129, 199, 132, 0.45);
+  border-radius: 999px;
+}
+
+/* Section label */
+.section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4CAF50;
+}
