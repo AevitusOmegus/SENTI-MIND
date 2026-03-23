@@ -14,8 +14,6 @@ build/
 *.env
 
 # ML artefacts
-backend/data/*.joblib
-backend/data/*.pkl
 *.csv
 
 # Node / frontend

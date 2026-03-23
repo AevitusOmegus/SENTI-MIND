@@ -2,7 +2,7 @@
 
 **SentiMind** is an intelligent AI-powered application designed to analyze text and detect the user's emotional state and any clinical risks (like stress, anxiety, or suicidal thoughts). It then provides compassionate, AI-generated coping strategies to help the user.
 
-## ✨ What Does This App Do?
+## Description
 When you type a sentence into SentiMind, it goes through a "pipeline" (a set of steps) to understand you:
 1. **Cleans the text**: Removes noise and translates emojis into words.
 2. **Detects Emotion**: Uses an AI model to figure out if you're sad, angry, happy, etc.
@@ -10,47 +10,49 @@ When you type a sentence into SentiMind, it goes through a "pipeline" (a set of 
 4. **Risk Assessment**: Checks for crisis keywords to see if you need immediate professional help.
 5. **AI Insight**: An LLM (Large Language Model) reads all this data and replies with a warm, empathetic response and actionable coping strategies!
 
-## 🛠️ The Tech Stack (What We Used)
-- **Frontend (The User Interface)**: 
-  - **React & Vite**: To build a fast, dynamic webpage.
-  - **TailwindCSS**: For rendering beautiful "glassmorphism" styles and colorful UI components seamlessly.
-- **Backend (The Brain)**:
-  - **FastAPI & Uvicorn**: A blazing-fast Python server that handles the web requests securely.
-  - **Scikit-Learn & Pandas**: For training our clinical Machine Learning classifier (`train_model.py`).
-  - **spaCy**: For understanding subjects and contexts in sentences.
-  - **OpenRouter**: The cloud AI provider that writes the empathetic insights.
+## Team member
+- **Abdullah Mushtaq** (23L-0892)
+
+## Tech Stack
+- **Frontend**: React, Vite, TailwindCSS (for glassmorphism style UI)
+- **Backend**: Python, FastAPI, Uvicorn, Scikit-Learn, Pandas, spaCy
+- **AI/ML**: LinearSVC (Custom trained clinical classifier), HuggingFace (Emotion extraction), OpenRouter/Xiaomi (LLM insight generation)
+- **Database**: *(Planned for future sprints)* Supabase (PostgreSQL)
 
 ---
 
-## 🚀 How To Set It Up (Step-by-Step for Beginners)
+## How to run using link and locally
 
-### 1. Setting up the Backend (The Brain)
+### 🌍 Live Link (Deployed)
+You can instantly access and interact with the live, deployed application without installing anything:
+👉 **[SentiMind Live Web App](https://senti-mind-mocha.vercel.app/)**
 
+### 💻 Running Locally
+Open your terminal and follow these steps to run the fully functioning pipeline on your own machine.
+
+#### 1. Setting up the Backend
 > [!CAUTION]
 > **Python 3.11 or 3.12 required.** Python 3.14 is currently NOT supported by our core Machine Learning dependencies.
 
-Open your terminal and type these commands exactly:
-
 1. Go into the backend folder:
    `cd backend`
-2. Create a virtual environment (a safe bubble for Python packages):
+2. Create and activate a virtual environment (Windows):
    `python -m venv .venv`
-3. Activate the bubble (Windows):
    `.venv\Scripts\activate`
-4. Install all the required brain power (dependencies):
+3. Install dependencies:
    `pip install -r requirements.txt`
-5. Download the language module:
+4. Download the language module:
    `python -m spacy download en_core_web_sm`
-6. Rename the `.env.example` file to `.env` and put your API keys inside.
-7. Start the server securely (this exact command bypasses annoying Windows errors!):
+5. Rename the `.env.example` file to `.env` and put your API keys inside.
+6. Start the server securely (this exact command bypasses annoying Windows errors!):
    `.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000`
 
-### 2. Setting up the Frontend (The Interface)
+#### 2. Setting up the Frontend
 Open a **new** terminal window and type:
 
 1. Go into the frontend folder:
    `cd frontend`
-2. Install all the user interface packages:
+2. Install the user interface packages:
    `npm install`
 3. Run the website!
    `npm run dev`
