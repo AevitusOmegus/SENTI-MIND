@@ -24,6 +24,8 @@ allowed_origins = [
     for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
     if origin.strip()
 ]
+if "https://senti-mind-mocha.vercel.app" not in allowed_origins:
+    allowed_origins.append("https://senti-mind-mocha.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
