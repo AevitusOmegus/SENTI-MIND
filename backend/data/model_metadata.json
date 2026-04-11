@@ -1,0 +1,75 @@
+{
+  "trained_at": "2026-04-10T21:02:33.225805",
+  "model_version": "v3",
+  "samples_train": 1120,
+  "samples_test": 280,
+  "classes": [
+    "Anxiety",
+    "Bipolar",
+    "Depression",
+    "Normal",
+    "Personality disorder",
+    "Stress",
+    "Suicidal"
+  ],
+  "best_params": {
+    "C": 0.5,
+    "ngram_range": [
+      1,
+      3
+    ],
+    "max_features": 15000
+  },
+  "accuracy": 0.9857142857142858,
+  "macro_f1": 0.9857053515590101,
+  "weighted_f1": 0.9857053515590102,
+  "cv_f1_macro_mean": 0.9784972215773733,
+  "cv_f1_macro_std": 0.015509272284862367,
+  "grid_search_best_cv_f1": 0.9559747258472486,
+  "per_class_metrics": {
+    "Anxiety": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 40
+    },
+    "Bipolar": {
+      "precision": 1.0,
+      "recall": 0.95,
+      "f1": 0.9743589743589743,
+      "support": 40
+    },
+    "Depression": {
+      "precision": 0.9523809523809523,
+      "recall": 1.0,
+      "f1": 0.975609756097561,
+      "support": 40
+    },
+    "Normal": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 40
+    },
+    "Personality disorder": {
+      "precision": 0.9523809523809523,
+      "recall": 1.0,
+      "f1": 0.975609756097561,
+      "support": 40
+    },
+    "Stress": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 40
+    },
+    "Suicidal": {
+      "precision": 1.0,
+      "recall": 0.95,
+      "f1": 0.9743589743589743,
+      "support": 40
+    }
+  },
+  "has_calibration": true,
+  "preprocessing": "negation_handling + crisis_markers (no crude keyword\u2192class markers)"
+}

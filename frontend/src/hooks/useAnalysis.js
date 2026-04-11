@@ -12,8 +12,10 @@ export function useAnalysis() {
     try {
       const data = await analyzeText(text);
       setResult(data);
+      return data;           // ← callers need this to log mood & save entry
     } catch (err) {
       setError(err?.response?.data?.detail ?? "An unexpected error occurred.");
+      return null;
     } finally {
       setLoading(false);
     }

@@ -38,19 +38,23 @@ Layer results:
 - Crisis keywords found: {", ".join(triggers) if triggers else "none"}{safety_note}
 
 Respond in exactly this structure:
-**Insight:** [2-3 sentence empathetic observation about the emotional and psychological content]
+**What You Are Feeling:** [detailed analysis of their current emotional state, based on the text and emotions detected]
 
-**Coping Strategies:**
-1. [Specific, actionable strategy]
-2. [Specific, actionable strategy]
+**Why You Might Be Feeling This:** [empathetic psychological reasoning behind their feelings]
 
-Keep the tone warm, non-judgmental, and professional. Do not use phrases like "As an AI"."""
+**Potential Issues/Risks:** [gentle discussion of any risks or raised issues from their text, if none, mention it subtly]
+
+**Exercises & Coping Strategies:**
+1. [Specific, actionable exercise or strategy]
+2. [Specific, actionable exercise or strategy]
+
+Keep the tone warm, empathetic, non-judgmental, and highly professional. Do not use phrases like "As an AI"."""
 
 
-async def generate_insight(text: str, emotions: list, clinical: dict, risk: dict) -> str:
+async def generate_insight(text: str, emotions: list, clinical: dict, risk: dict) -> tuple[str, dict | None]:
     if not settings.OPENROUTER_API_KEY:
         logger.warning("OPENROUTER_API_KEY not set — using fallback insight.")
-        return _fallback_insight(clinical)
+        return _fallback_insight(clinical), None
 
     headers = {
         "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
@@ -71,33 +75,39 @@ async def generate_insight(text: str, emotions: list, clinical: dict, risk: dict
 
         if response.status_code != 200:
             logger.warning("OpenRouter returned %s: %s", response.status_code, response.text)
-            return _fallback_insight(clinical)
+            return _fallback_insight(clinical), None
 
         data = response.json()
-        return data["choices"][0]["message"]["content"].strip()
+        insight_text = data["choices"][0]["message"]["content"].strip()
+        usage = data.get("usage", {})
+        return insight_text, {"model": data.get("model", OPENROUTER_MODEL), "usage": usage}
 
     except asyncio.TimeoutError:
         logger.error("OpenRouter timed out after %ss", OPENROUTER_TIMEOUT)
-        return _fallback_insight(clinical)
+        return _fallback_insight(clinical), None
     except httpx.HTTPError as exc:
         logger.error("OpenRouter HTTP error: %s", exc)
-        return _fallback_insight(clinical)
+        return _fallback_insight(clinical), None
     except (KeyError, IndexError) as exc:
         logger.error("OpenRouter unexpected response shape: %s", exc)
-        return _fallback_insight(clinical)
+        return _fallback_insight(clinical), None
     except Exception as exc:
         logger.exception("OpenRouter unexpected error: %s", exc)
-        return _fallback_insight(clinical)
+        return _fallback_insight(clinical), None
 
 
 def _fallback_insight(clinical: dict) -> str:
     cat = clinical.get("category", "your current state")
     return (
-        f"**Insight:**\n"
+        f"**What You Are Feeling:**\n"
         f"It sounds like you may be experiencing feelings related to {cat}. "
-        "Your emotions are valid, and acknowledging them is an important first step. "
-        "Please remember you are not alone in this.\n\n"
-        "**Coping Strategies:**\n"
+        "Your emotions are valid, and acknowledging them is an important first step.\n\n"
+        f"**Why You Might Be Feeling This:**\n"
+        "It's completely normal to feel this way, especially when navigating difficult situations "
+        "or carrying unseen burdens.\n\n"
+        f"**Potential Issues/Risks:**\n"
+        "Please remember you are not alone in this. While everyone faces challenges, your well-being comes first.\n\n"
+        "**Exercises & Coping Strategies:**\n"
         "1. Practice grounding: name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, and 1 you taste.\n"
         "2. Reach out to a trusted person or a professional counselor — talking helps."
     )

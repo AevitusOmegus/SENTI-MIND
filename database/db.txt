@@ -1,2 +1,0 @@
-No DB in current sprint will be added in later sprints for storing data and logins 
-We will use Supabase(PostgreSQL) for storing data and logins

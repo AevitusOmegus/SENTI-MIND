@@ -36,6 +36,12 @@ class RiskAssessment(BaseModel):
     safety_protocol: bool
 
 
+class ModelUsed(BaseModel):
+    name: str
+    type: str
+    provider: str
+    details: Optional[dict] = None
+
 class AnalysisResponse(BaseModel):
     raw_text: str
     preprocessed_text: str
@@ -44,3 +50,4 @@ class AnalysisResponse(BaseModel):
     entities: list[EntityResult]
     risk: RiskAssessment
     insight: Optional[str] = None
+    models_used: list[ModelUsed] = []

@@ -1,111 +1,264 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { X, Sparkles, Heart, Brain, Shield, Info } from "lucide-react";
 
-export default function InsightModal({ insight, onClose }) {
+export default function InsightModal({ insight, modelsUsed, onClose }) {
+  const modalRef = useRef(null);
+  const previousActiveElement = useRef(null);
+
+  // AHCI: Focus trap and keyboard navigation
   useEffect(() => {
-    const handler = (e) => e.key === "Escape" && onClose();
+    // Store the element that opened the modal
+    previousActiveElement.current = document.activeElement;
+    
+    // Focus the modal when opened
+    modalRef.current?.focus();
+    
+    // Prevent body scroll
+    document.body.style.overflow = "hidden";
+    
+    const handler = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+      // Trap focus within modal
+      if (e.key === "Tab") {
+        const focusableElements = modalRef.current?.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements?.length) {
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+          
+          if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+    
     window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    return () => {
+      window.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+      // Restore focus
+      previousActiveElement.current?.focus();
+    };
   }, [onClose]);
 
   if (!insight) return null;
 
+  // Parse the structured insight content
+  const parseInsight = (content) => {
+    const sections = {
+      feeling: "",
+      why: "",
+      issues: "",
+      strategies: [],
+    };
+
+    // Extract sections using regex
+    const feelingMatch = content.match(/\*\*What You Are Feeling:\*\*\s*([\s\S]*?)(?=\*\*Why You Might Be Feeling This:\**|$)/);
+    const whyMatch = content.match(/\*\*Why You Might Be Feeling This:\*\*\s*([\s\S]*?)(?=\*\*Potential Issues\/Risks:\**|$)/);
+    const issuesMatch = content.match(/\*\*Potential Issues\/Risks:\*\*\s*([\s\S]*?)(?=\*\*Exercises \u0026 Coping Strategies:\**|$)/);
+    const copingMatch = content.match(/\*\*Exercises \u0026 Coping Strategies:\*\*\s*([\s\S]*?)$/);
+
+    if (feelingMatch) sections.feeling = feelingMatch[1].trim().replace(/\*\*(.*?)\*\*/g, "$1");
+    if (whyMatch) sections.why = whyMatch[1].trim().replace(/\*\*(.*?)\*\*/g, "$1");
+    if (issuesMatch) sections.issues = issuesMatch[1].trim().replace(/\*\*(.*?)\*\*/g, "$1");
+    
+    if (copingMatch) {
+      const copingText = copingMatch[1].trim();
+      sections.strategies = copingText
+        .split("\n")
+        .map(line => line.replace(/^(\d+\.|-|\*)\s*/, "").replace(/\*\*(.*?)\*\*/g, "$1").trim())
+        .filter(line => line.length > 0);
+    }
+
+    return sections;
+  };
+
+  const sections = parseInsight(insight);
+  const hasStructuredContent = sections.feeling || sections.why || sections.strategies.length > 0;
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm animate-fade-in"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
     >
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-warm-900/30 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Modal */}
       <div
-        className="glass-card-deep relative w-full max-w-lg mx-4 p-7 animate-slide-up"
-        onClick={(e) => e.stopPropagation()}
+        ref={modalRef}
+        tabIndex={-1}
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden medical-card-elevated animate-medical-slide-up"
       >
-        {/* Close */}
-        <button
-          id="close-insight-modal"
-          onClick={onClose}
-          aria-label="Close modal"
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-sage-100 text-sage-700 hover:bg-sage-200 transition-colors text-sm font-bold"
-        >
-          ✕
-        </button>
-
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sage-300 to-sage-400 flex items-center justify-center text-white text-base shadow-sm">
-            💡
-          </div>
-          <div>
-            <h2 className="text-base font-700 text-sage-700 leading-tight">
-              AI Insight
-            </h2>
-            <p className="text-xs text-sage-500">Powered by SentiMind</p>
+        <div className="sticky top-0 z-10 bg-white border-b border-sage-100 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sage-400 to-sage-600 flex items-center justify-center text-white shadow-medical"
+              >
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 id="modal-title" className="font-bold text-warm-800">
+                  AI Insight
+                </h2>
+                <p className="text-xs text-warm-500">Personalized Support Recommendations</p>
+              </div>
+            </div>
+            
+            <button
+              onClick={onClose}
+              aria-label="Close modal"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-warm-500 hover:bg-sage-50 hover:text-sage-700 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
-        <div className="h-px bg-sage-200 mb-4" />
-
-        {/* Structured Content Render */}
-        <div className="content-container">
-          {(() => {
-            if (!insight) return null;
-            
-            const hasInsight = insight.includes("**Insight:**");
-            const hasCoping = insight.includes("**Coping Strategies:**");
-            
-            if (hasInsight && hasCoping) {
-              const parts = insight.split("**Coping Strategies:**");
-              const insightPart = parts[0].replace("**Insight:**", "").trim();
-              const copingPart = parts[1] ? parts[1].trim() : "";
-              
-              const copingLines = copingPart.split("\n").filter(line => line.trim() !== "");
-              
-              return (
-                <div className="space-y-5">
-                  <div className="bg-sage-50/60 border border-sage-100 rounded-2xl p-5 shadow-inner relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-sage-200 to-transparent opacity-30 rounded-bl-full" />
-                    <p className="text-sm leading-relaxed text-[#2E7D32] relative z-10 font-medium whitespace-pre-line">
-                      {insightPart.replace(/\*\*(.*?)\*\*/g, '$1')}
-                    </p>
-                  </div>
-                  
-                  {copingLines.length > 0 && (
-                    <div className="pt-1">
-                      <h3 className="text-sage-700 font-bold text-[13px] uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-md bg-sage-200 flex justify-center items-center text-xs shadow-sm">🌱</span>
-                        Actionable Strategies
-                      </h3>
-                      <ul className="space-y-3 pl-1 text-sm text-[#3a7c3f]">
-                        {copingLines.map((line, idx) => {
-                          const cleanLine = line.replace(/^(\d+\.|-|\*)\s*/, "").replace(/\*\*(.*?)\*\*/g, '$1').trim();
-                          if (!cleanLine) return null;
-                          return (
-                            <li key={idx} className="flex items-start gap-3 group">
-                              <span className="w-1.5 h-1.5 rounded-full bg-sage-400 mt-1.5 flex-shrink-0 group-hover:scale-150 group-hover:bg-sage-600 transition-all duration-300" />
-                              <span className="leading-relaxed font-medium opacity-90">{cleanLine}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
+        {/* Content */}
+        <div className="overflow-y-auto max-h-[calc(90vh-140px)]">
+          <div className="p-6 space-y-5">
+            {hasStructuredContent ? (
+              <>
+                {/* What You're Feeling */}
+                {sections.feeling && (
+                  <section className="medical-card-subtle p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-sage-100 flex items-center justify-center">
+                        <Brain className="w-4 h-4 text-sage-600" />
+                      </div>
+                      <h3 className="font-semibold text-warm-800">What You Are Feeling</h3>
                     </div>
-                  )}
+                    <p className="text-sm text-warm-700 leading-relaxed pl-10">
+                      {sections.feeling}
+                    </p>
+                  </section>
+                )}
+
+                {/* Why You Might Be Feeling This */}
+                {sections.why && (
+                  <section className="medical-card-subtle p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-warm-100 flex items-center justify-center">
+                        <Info className="w-4 h-4 text-warm-600" />
+                      </div>
+                      <h3 className="font-semibold text-warm-800">Why You Might Be Feeling This</h3>
+                    </div>
+                    <p className="text-sm text-warm-700 leading-relaxed pl-10">
+                      {sections.why}
+                    </p>
+                  </section>
+                )}
+
+                {/* Potential Issues */}
+                {sections.issues && (
+                  <section className="medical-card border-medical-moderate/20 bg-medical-moderate/5 p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-lg bg-medical-moderate/20 flex items-center justify-center">
+                        <Shield className="w-4 h-4 text-medical-moderate" />
+                      </div>
+                      <h3 className="font-semibold text-warm-800">Potential Considerations</h3>
+                    </div>
+                    <p className="text-sm text-warm-700 leading-relaxed pl-10">
+                      {sections.issues}
+                    </p>
+                  </section>
+                )}
+
+                {/* Coping Strategies */}
+                {sections.strategies.length > 0 && (
+                  <section className="medical-card border-sage-300 p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-sage-100 flex items-center justify-center">
+                        <Heart className="w-4 h-4 text-sage-600" />
+                      </div>
+                      <h3 className="font-semibold text-warm-800">Coping Strategies & Exercises</h3>
+                    </div>
+                    
+                    <ul className="space-y-3 pl-10">
+                      {sections.strategies.map((strategy, idx) => (
+                        <li key={idx} className="flex items-start gap-3 group">
+                          <span className="w-6 h-6 rounded-full bg-sage-100 flex items-center justify-center text-xs font-medium text-sage-700 flex-shrink-0 mt-0.5 group-hover:bg-sage-200 transition-colors">
+                            {idx + 1}
+                          </span>
+                          <span className="text-sm text-warm-700 leading-relaxed pt-0.5">
+                            {strategy}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </>
+            ) : (
+              /* Fallback for non-standard generation */
+              <section className="medical-card-subtle p-5">
+                <p className="text-sm text-warm-700 leading-relaxed whitespace-pre-line">
+                  {insight.replace(/\*\*(.*?)\*\*/g, "$1")}
+                </p>
+              </section>
+            )}
+
+            {/* Model Telemetry */}
+            {modelsUsed && modelsUsed.length > 0 && (
+              <section className="pt-4 border-t border-sage-100">
+                <button
+                  className="flex items-center gap-2 text-xs text-warm-500 hover:text-sage-600 transition-colors"
+                  onClick={(e) => {
+                    const details = e.currentTarget.nextElementSibling;
+                    details?.classList.toggle("hidden");
+                  }}
+                >
+                  <Info className="w-3 h-3" />
+                  <span className="font-medium">Technical Details</span>
+                </button>
+                
+                <div className="hidden mt-4 space-y-3">
+                  {modelsUsed.map((model, idx) => (
+                    <div key={idx} className="bg-warm-50 p-3 rounded-lg border border-warm-100">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-warm-700">{model.name}</span>
+                        <span className="text-[10px] uppercase font-bold text-warm-400 border border-warm-200 px-1.5 py-0.5 rounded">
+                          {model.type}
+                        </span>
+                      </div>
+                      {model.details?.total_tokens && (
+                        <div className="text-[10px] text-warm-500 flex gap-3">
+                          <span>Tokens: {model.details.total_tokens}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              );
-            }
-            
-            // Fallback for non-standard generation
-            return (
-              <p className="text-sm leading-relaxed text-[#2E7D32] whitespace-pre-line">
-                {insight.replace(/\*\*(.*?)\*\*/g, '$1')}
-              </p>
-            );
-          })()}
+              </section>
+            )}
+          </div>
         </div>
 
-        <button
-          onClick={onClose}
-          className="btn-sage mt-5 w-full py-2.5 text-sm"
-        >
-          Got it
-        </button>
+        {/* Footer */}
+        <div className="sticky bottom-0 bg-white border-t border-sage-100 px-6 py-4">
+          <button
+            onClick={onClose}
+            className="medical-btn medical-btn-primary w-full"
+          >
+            Got it, thank you
+          </button>
+        </div>
       </div>
     </div>
   );

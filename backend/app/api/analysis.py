@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.models.schemas import (
     AnalysisRequest, AnalysisResponse,
     EmotionResult, ClinicalResult, ClinicalCategory,
-    EntityResult, RiskAssessment,
+    EntityResult, RiskAssessment, ModelUsed
 )
 from app.models.classifier import classifier
 from app.models.emotions import detect_emotions
@@ -50,7 +50,30 @@ async def analyze_text(payload: AnalysisRequest):
             safety_protocol=raw_risk["safety_protocol"],
         )
 
-        insight = await generate_insight(cleaned_text, raw_emotions, raw_clinical, raw_risk)
+        insight, llm_details = await generate_insight(cleaned_text, raw_emotions, raw_clinical, raw_risk)
+
+        models_used = [
+            ModelUsed(
+                name="j-hartmann/emotion-english-distilroberta-base",
+                type="emotion",
+                provider="huggingface",
+                details={"api_endpoint": "router.huggingface.co"}
+            ),
+            ModelUsed(
+                name="ClinicalClassifier (LinearSVC TF-IDF)",
+                type="clinical",
+                provider="local",
+            )
+        ]
+        if llm_details:
+            models_used.append(
+                ModelUsed(
+                    name=llm_details.get("model", "xiaomi/mimo-v2-omni"),
+                    type="llm",
+                    provider="openrouter",
+                    details=llm_details.get("usage", {})
+                )
+            )
 
         return AnalysisResponse(
             raw_text=raw_text,
@@ -60,6 +83,7 @@ async def analyze_text(payload: AnalysisRequest):
             entities=entities,
             risk=risk,
             insight=insight,
+            models_used=models_used,
         )
 
     except HTTPException:
