@@ -4,38 +4,38 @@ export default function WellnessToolsPage() {
   const [activeTab, setActiveTab] = useState("breathing");
 
   return (
-    <div className="space-y-10 max-w-4xl mx-auto animate-medical-fade-in relative pb-10">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-sage-200/50 pb-6 relative">
+    <div className="space-y-6 animate-medical-fade-in relative">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-sage-200/50 pb-5 relative">
         <div className="absolute top-0 right-10 w-64 h-64 bg-sage-200/30 rounded-full blur-3xl pointer-events-none -z-10"></div>
-        <div className="space-y-2">
-           <div className="inline-flex items-center gap-2 px-3 py-1 bg-sage-100/50 border border-sage-200/60 rounded-lg text-sage-700 text-xs font-bold uppercase tracking-widest mb-2">
+        <div className="space-y-1">
+           <div className="inline-flex items-center gap-2 px-3 py-1 bg-sage-100/50 border border-sage-200/60 rounded-lg text-sage-700 text-xs font-bold uppercase tracking-widest mb-1">
              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Clinical Tools
            </div>
-           <h1 className="text-4xl font-light text-warm-800 tracking-tight">Wellness <span className="font-semibold text-sage-700">Hub</span></h1>
-           <p className="text-warm-500 mt-2 text-lg">Immediate relief techniques for moments of high stress or panic.</p>
+           <h1 className="text-2xl sm:text-4xl font-light text-warm-800 tracking-tight">Wellness <span className="font-semibold text-sage-700">Hub</span></h1>
+           <p className="text-warm-500 text-sm sm:text-base">Immediate relief techniques for moments of high stress or panic.</p>
         </div>
       </div>
 
       <div className="flex justify-center relative z-20">
-        <div className="flex gap-2 p-1.5 bg-white/80 backdrop-blur-xl border border-sage-200/60 rounded-2xl shadow-sm w-max hover:shadow-md transition-shadow">
+        <div className="flex gap-1.5 p-1.5 bg-white/80 backdrop-blur-xl border border-sage-200/60 rounded-2xl shadow-sm w-full sm:w-max overflow-x-auto">
           <button
             onClick={() => setActiveTab("breathing")}
-            className={`px-8 py-3 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center gap-2 ${activeTab === "breathing" ? "bg-sage-600 text-white shadow-medical" : "text-sage-600 hover:text-sage-800 hover:bg-sage-50"}`}
+            className={`flex-1 sm:flex-none px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === "breathing" ? "bg-sage-600 text-white shadow-md" : "text-sage-600 hover:text-sage-800 hover:bg-sage-50"}`}
           >
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 2 5 2 5 2 0 4 5 8 5 8s5-4 5-8c0 0 5 0 5-2A10 10 0 0 0 12 2z"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 2 5 2 5 2 0 4 5 8 5 8s5-4 5-8c0 0 5 0 5-2A10 10 0 0 0 12 2z"/></svg>
             Box Breathing 
           </button>
           <button
             onClick={() => setActiveTab("grounding")}
-            className={`px-8 py-3 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center gap-2 ${activeTab === "grounding" ? "bg-sage-600 text-white shadow-medical" : "text-sage-600 hover:text-sage-800 hover:bg-sage-50"}`}
+            className={`flex-1 sm:flex-none px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === "grounding" ? "bg-sage-600 text-white shadow-md" : "text-sage-600 hover:text-sage-800 hover:bg-sage-50"}`}
           >
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             5-4-3-2-1 Grounding
           </button>
         </div>
       </div>
 
-      <div className="bg-white/70 backdrop-blur-xl border border-sage-200/60 shadow-sm p-8 md:p-12 min-h-[550px] flex items-center justify-center rounded-3xl relative overflow-hidden group">
+      <div className="bg-white/70 backdrop-blur-xl border border-sage-200/60 shadow-sm p-6 sm:p-12 min-h-[420px] sm:min-h-[550px] flex items-center justify-center rounded-3xl relative overflow-hidden group">
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-sage-200/20 rounded-full blur-3xl pointer-events-none group-hover:bg-sage-300/20 transition-colors duration-1000"></div>
         {activeTab === "breathing" && <BoxBreather />}
         {activeTab === "grounding" && <GroundingTool />}
