@@ -83,27 +83,24 @@ export default function JournalPage() {
   const isCritical = result && (result.risk?.level === "critical" || result.clinical?.category === "Suicidal");
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="medical-heading-2 text-warm-800 tracking-tight">Secure Journal</h1>
-          <p className="text-warm-500 text-sm mt-1">Reflect. AI will analyze and save your patterns securely.</p>
-        </div>
+    <div className="space-y-6">
+      <div className="mb-2">
+        <h1 className="medical-heading-2 text-warm-800 tracking-tight text-2xl sm:text-3xl">Secure Journal</h1>
+        <p className="text-warm-500 text-sm mt-1">Reflect. AI will analyze and save your patterns securely.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* LEFT COLUMN: Input & Actionable Insights */}
-        <div className="lg:col-span-2 flex flex-col gap-8">
+        <div className="lg:col-span-2 flex flex-col gap-6">
           
           {isCritical && (
             <div className="animate-medical-fade-in">
               <CrisisAlertBanner isVisible={true} category={result?.clinical?.category} confidence={result?.clinical?.confidence} />
-              {/* Optional: Add grounding tools link directly in the top banner to consolidate space */}
-              <div className="mt-4 flex gap-4">
-                <Link to="/dashboard/wellness" className="medical-btn bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-6 py-2">
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link to="/dashboard/wellness" className="medical-btn bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-4 py-2 text-sm">
                   🌬️ Box Breathing
                 </Link>
-                <Link to="/dashboard/wellness" className="medical-btn bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-6 py-2">
+                <Link to="/dashboard/wellness" className="medical-btn bg-white border border-rose-200 text-rose-700 hover:bg-rose-100 px-4 py-2 text-sm">
                   🖐️ 5-4-3-2-1 Grounding
                 </Link>
               </div>
@@ -111,33 +108,33 @@ export default function JournalPage() {
           )}
 
           {/* Input Form */}
-          <form onSubmit={handleSubmit} className="medical-card p-6 animate-medical-slide-up">
+          <form onSubmit={handleSubmit} className="medical-card p-4 sm:p-6 animate-medical-slide-up">
             <label className="medical-label flex justify-between items-center mb-3">
               <span>How are you feeling?</span>
-              <span className="text-warm-400 font-normal">({text.length} chars)</span>
+              <span className="text-warm-400 font-normal normal-case text-xs">({text.length} chars)</span>
             </label>
             
             <textarea
               value={text}
               onChange={e => setText(e.target.value)}
               placeholder="Start typing your entry here..."
-              rows={8}
+              rows={6}
               disabled={loading}
-              className="medical-input resize-none"
+              className="medical-input resize-none text-base"
             />
 
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
               <div className="text-sm text-sage-600 font-medium">{saveStatus}</div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-2 ml-auto">
                 {result && result.clinical.category === "Normal" && (
-                  <button type="button" onClick={handleGratitude} className="medical-btn medical-btn-secondary py-2 px-4 shadow-sm" title="Save this positive thought to your Gratitude Jar">
+                  <button type="button" onClick={handleGratitude} className="medical-btn medical-btn-secondary py-2 px-3 text-sm shadow-sm">
                     🫙 Add to Jar
                   </button>
                 )}
                 {result ? (
-                  <button type="button" onClick={handleReset} className="medical-btn medical-btn-secondary py-2 px-4 shadow-sm">New Entry</button>
+                  <button type="button" onClick={handleReset} className="medical-btn medical-btn-secondary py-2 px-4 text-sm shadow-sm">New Entry</button>
                 ) : (
-                  <button type="submit" disabled={loading || !text.trim()} className="medical-btn medical-btn-primary py-2 px-6 shadow-md">
+                  <button type="submit" disabled={loading || !text.trim()} className="medical-btn medical-btn-primary py-2 px-5 text-sm shadow-md">
                     {loading ? "Analyzing..." : "Analyze & Save"}
                   </button>
                 )}

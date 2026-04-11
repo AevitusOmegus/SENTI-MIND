@@ -512,3 +512,19 @@ body {
   display: inline-block;
   animation: medical-pulse 2.5s ease-in-out infinite;
 }
+
+/* =============================================================================
+   MOBILE SAFE AREA SUPPORT
+   ============================================================================= */
+
+/* Safe area padding for iOS home indicator / Android nav bar */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Ensure mobile bottom nav doesn't overlap content */
+@media (max-width: 767px) {
+  body {
+    overscroll-behavior-y: none;
+  }
+}
