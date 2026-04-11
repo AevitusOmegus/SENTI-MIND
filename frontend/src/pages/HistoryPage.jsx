@@ -23,22 +23,22 @@ export default function HistoryPage() {
   if (loading) return <div className="text-center py-10">Loading history...</div>;
 
   return (
-    <div className="space-y-10 max-w-5xl mx-auto animate-medical-fade-in">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-sage-200/50 pb-6 relative">
+    <div className="space-y-6 animate-medical-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-sage-200/50 pb-5 relative">
         <div className="absolute top-0 left-0 w-64 h-64 bg-sage-200/30 rounded-full blur-3xl pointer-events-none -z-10"></div>
         
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-sage-100/50 border border-sage-200/60 rounded-lg text-sage-700 text-xs font-bold uppercase tracking-widest mb-2">
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Data Vault
           </div>
-          <h1 className="text-4xl font-light text-warm-800 tracking-tight">Clinical <span className="font-semibold text-sage-700">History</span></h1>
-          <p className="text-warm-500 text-lg">Secure repository of your emotional tracking. Ready for counselor export.</p>
+          <h1 className="text-2xl sm:text-4xl font-light text-warm-800 tracking-tight">Clinical <span className="font-semibold text-sage-700">History</span></h1>
+          <p className="text-warm-500 text-sm sm:text-base">Secure repository of your emotional tracking. Ready for counselor export.</p>
         </div>
 
         <button
           onClick={handleExport}
           disabled={exporting || trends.length === 0}
-          className="group relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-sage-800 hover:bg-sage-900 text-white rounded-xl shadow-medical-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 overflow-hidden"
+          className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 w-full sm:w-auto bg-sage-800 hover:bg-sage-900 text-white text-sm rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 overflow-hidden"
         >
           <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:transition-all group-hover:duration-1000 group-hover:translate-x-full"></div>
           {exporting ? (
@@ -54,7 +54,7 @@ export default function HistoryPage() {
         </button>
       </div>
 
-      <div className="bg-white/70 backdrop-blur-xl border border-sage-200/60 rounded-3xl shadow-sm p-4 md:p-8 relative overflow-hidden">
+      <div className="bg-white/70 backdrop-blur-xl border border-sage-200/60 rounded-2xl shadow-sm p-4 sm:p-6 relative overflow-hidden">
         <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-sage-200/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <div id="report-content" className="bg-white rounded-2xl p-6 shadow-sm border border-sage-100 relative z-10 transition-colors">

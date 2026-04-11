@@ -19,14 +19,14 @@ export default function GratitudeJarPage() {
   if (loading) return <div className="text-center py-10">Loading jar...</div>;
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto animate-medical-fade-in">
-      <div className="text-center space-y-4">
-        <div className="mx-auto w-20 h-20 bg-sage-100/50 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-sage-200/50 shadow-sm mb-6">
-          <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sage-600" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+    <div className="space-y-6 animate-medical-fade-in">
+      <div className="text-center space-y-2">
+        <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-sage-100/50 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-sage-200/50 shadow-sm mb-3">
+          <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sage-600" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
         </div>
-        <h1 className="text-4xl font-light text-warm-800 tracking-tight">The Gratitude <span className="font-semibold text-sage-700">Vault</span></h1>
-        <p className="text-warm-500 text-lg max-w-xl mx-auto">
-          A secure, isolated collection of your highest energy points. Observe and reflect upon your positive clinical indicators.
+        <h1 className="text-2xl sm:text-4xl font-light text-warm-800 tracking-tight">The Gratitude <span className="font-semibold text-sage-700">Vault</span></h1>
+        <p className="text-warm-500 text-sm sm:text-base max-w-xl mx-auto">
+          A collection of your highest energy positive moments. Reflect and recharge.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export default function GratitudeJarPage() {
           </div>
         ) : (
           snippets.map((snip) => (
-            <div key={snip.id} className="relative group overflow-hidden bg-white/70 backdrop-blur-xl border border-sage-200/60 p-8 rounded-3xl shadow-sm hover:shadow-medical-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[220px]">
+          <div key={snip.id} className="relative group overflow-hidden bg-white/70 backdrop-blur-xl border border-sage-200/60 p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[180px] sm:min-h-[220px]">
               <div className="absolute top-0 right-0 w-32 h-32 bg-sage-200/30 rounded-full blur-3xl -z-10 group-hover:bg-sage-300/40 transition-colors"></div>
               
               <div className="absolute top-6 right-6 opacity-10 group-hover:opacity-30 transition-opacity">

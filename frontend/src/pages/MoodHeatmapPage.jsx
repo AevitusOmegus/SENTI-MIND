@@ -32,28 +32,28 @@ export default function MoodHeatmapPage() {
   });
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto animate-medical-fade-in relative">
-      <div className="text-center space-y-4">
-        <div className="mx-auto w-20 h-20 bg-sage-100/50 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-sage-200/50 shadow-sm mb-4">
-          <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sage-600" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+    <div className="space-y-6 animate-medical-fade-in relative">
+      <div className="text-center space-y-2">
+        <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-sage-100/50 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-sage-200/50 shadow-sm mb-3">
+          <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-sage-600" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
         </div>
-        <h1 className="text-4xl font-light text-warm-800 tracking-tight">Clinical <span className="font-semibold text-sage-700">Heatmap</span></h1>
-        <p className="text-warm-500 text-lg max-w-xl mx-auto">
+        <h1 className="text-2xl sm:text-4xl font-light text-warm-800 tracking-tight">Clinical <span className="font-semibold text-sage-700">Heatmap</span></h1>
+        <p className="text-warm-500 text-sm sm:text-base max-w-xl mx-auto">
           Pattern recognition of your longitudinal emotional states across the past 30 days.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Col: Main Grid Block */}
-        <div className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-sage-200/60 p-8 rounded-3xl shadow-sm relative overflow-hidden">
+        <div className="lg:col-span-2 bg-white/70 backdrop-blur-xl border border-sage-200/60 p-4 sm:p-8 rounded-3xl shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-sage-200/20 rounded-full blur-3xl pointer-events-none"></div>
           
-          <h3 className="text-xl font-bold text-warm-800 mb-6 flex items-center gap-2">
+          <h3 className="text-lg sm:text-xl font-bold text-warm-800 mb-4 sm:mb-6 flex items-center gap-2">
             30-Day Grid <span className="text-xs font-semibold bg-sage-100 text-sage-600 px-2 py-1 rounded-md">Live</span>
           </h3>
 
-          <div className="grid grid-cols-7 gap-3 mb-10 relative z-10">
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-3 mb-6 sm:mb-10 relative z-10">
             {grid.map((cell, i) => (
               <div
                 key={cell.date}
