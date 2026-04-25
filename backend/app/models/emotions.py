@@ -26,15 +26,6 @@ _FALLBACK = [{"label": "neutral", "score": 1.0}]
 
 
 async def detect_emotions(text: str) -> list[dict]:
-    """
-    Detect emotions using HuggingFace API.
-
-    Args:
-        text: Input text to analyze
-
-    Returns:
-        List of emotion dicts with label and score (sorted by score desc)
-    """
     if not isinstance(text, str) or not text.strip():
         return _FALLBACK
 
@@ -42,43 +33,53 @@ async def detect_emotions(text: str) -> list[dict]:
         logger.warning("HF_API_TOKEN not set — returning fallback emotions.")
         return _FALLBACK
 
+    # DistilRoBERTa has a 512-token limit; 1800 chars is a safe character proxy
+    truncated = text[:1800]
     headers = {"Authorization": f"Bearer {settings.HF_API_TOKEN}"}
 
-    try:
-        async with httpx.AsyncClient(timeout=HF_TIMEOUT) as client:
-            response = await client.post(HF_API_URL, headers=headers, json={"inputs": text})
+    for attempt in range(2):
+        try:
+            async with httpx.AsyncClient(timeout=HF_TIMEOUT) as client:
+                response = await client.post(HF_API_URL, headers=headers, json={"inputs": truncated})
 
-        if response.status_code != 200:
-            logger.warning("HF API returned %s: %s", response.status_code, response.text[:200])
+            if response.status_code == 429:
+                logger.warning("HF API rate-limited (attempt %d)", attempt + 1)
+                if attempt == 0:
+                    import asyncio
+                    await asyncio.sleep(2.0)
+                    continue
+                return _FALLBACK
+
+            if response.status_code != 200:
+                logger.warning("HF API returned %s: %s", response.status_code, response.text[:200])
+                if attempt == 0:
+                    continue
+                return _FALLBACK
+
+            results = response.json()
+            if isinstance(results, list) and results:
+                if isinstance(results[0], list):
+                    results = results[0]
+                elif isinstance(results[0], dict) and "label" in results[0]:
+                    results = [{"label": r["label"], "score": r["score"]} for r in results]
+
+            emotions = [
+                {"label": r.get("label", "").lower(), "score": round(r.get("score", 0.0), 4)}
+                for r in results
+            ]
+            emotions.sort(key=lambda x: x["score"], reverse=True)
+            return emotions
+
+        except httpx.TimeoutException:
+            logger.error("HF API timed out (attempt %d)", attempt + 1)
+        except httpx.HTTPError as exc:
+            logger.error("HF API HTTP error: %s", exc)
+        except Exception as exc:
+            logger.exception("HF API unexpected error: %s", exc)
             return _FALLBACK
 
-        results = response.json()
+        if attempt == 0:
+            import asyncio
+            await asyncio.sleep(1.0)
 
-        # Handle different response formats
-        if isinstance(results, list) and results:
-            if isinstance(results[0], list):
-                results = results[0]
-            elif isinstance(results[0], dict) and "label" in results[0]:
-                # Single result format from newer models
-                results = [{"label": r["label"], "score": r["score"]} for r in results]
-
-        # Return all model predictions without modification
-        emotions = []
-        for result in results:
-            label = result.get("label", "").lower()
-            score = result.get("score", 0.0)
-            emotions.append({"label": label, "score": round(score, 4)})
-
-        # Sort by score descending
-        emotions.sort(key=lambda x: x["score"], reverse=True)
-        return emotions  # Return all model outputs
-
-    except httpx.TimeoutException:
-        logger.error("HF API timed out after %ss", HF_TIMEOUT)
-        return _FALLBACK
-    except httpx.HTTPError as exc:
-        logger.error("HF API HTTP error: %s", exc)
-        return _FALLBACK
-    except Exception as exc:
-        logger.exception("HF API unexpected error: %s", exc)
-        return _FALLBACK
+    return _FALLBACK

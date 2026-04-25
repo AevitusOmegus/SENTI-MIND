@@ -121,22 +121,27 @@ EMOJI_MAP: dict[str, str] = {
 
 _URL_RE = re.compile(r"https?://\S+|www\.\S+")
 _MULTI_SPACE_RE = re.compile(r"\s{2,}")
+# Variation selector and zero-width joiner cleanup (leftover after emoji substitution)
+_VARIATION_SELECTOR_RE = re.compile(r"[\ufe00-\ufe0f\u200d]")
+
+# Build a single regex that matches multi-codepoint emoji sequences longest-first
+# (sort descending by length so e.g. ☠️ is tried before ☠)
+_sorted_emoji = sorted(EMOJI_MAP.keys(), key=len, reverse=True)
+_EMOJI_RE = re.compile("|".join(re.escape(e) for e in _sorted_emoji))
 
 
 def clean_text(raw: str) -> tuple[str, list[str]]:
     """Replace emojis with text equivalents, strip URLs, and normalise whitespace."""
     emoji_tokens: list[str] = []
 
-    result = []
-    for ch in raw:
-        if ch in EMOJI_MAP:
-            replacement = EMOJI_MAP[ch]
-            emoji_tokens.append(replacement)
-            result.append(f" {replacement} ")
-        else:
-            result.append(ch)
-    text = "".join(result)
+    def _replace(m: re.Match) -> str:
+        replacement = EMOJI_MAP[m.group(0)]
+        emoji_tokens.append(replacement)
+        return f" {replacement} "
 
+    text = _EMOJI_RE.sub(_replace, raw)
+    # Strip any dangling variation selectors left after partial emoji matches
+    text = _VARIATION_SELECTOR_RE.sub("", text)
     text = _URL_RE.sub("", text)
     text = _MULTI_SPACE_RE.sub(" ", text).strip()
 

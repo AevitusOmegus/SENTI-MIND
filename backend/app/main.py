@@ -1,3 +1,4 @@
+import logging
 import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
@@ -7,10 +8,22 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.api import router
 from app.models.classifier import classifier
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    classifier.load()
+    try:
+        classifier.load()
+        logger.info("ClinicalClassifier loaded successfully.")
+    except FileNotFoundError as exc:
+        logger.critical(
+            "Model artifact missing — run scripts/train_model_improved.py first.\n%s", exc
+        )
+        raise SystemExit(1) from exc
+    except Exception as exc:
+        logger.critical("Failed to load classifier: %s", exc)
+        raise SystemExit(1) from exc
     yield
 
 
@@ -41,7 +54,8 @@ class ForceCORSMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
         except Exception as exc:
-            response = JSONResponse({"detail": str(exc)}, status_code=500)
+            logger.exception("Unhandled error in CORS middleware: %s", exc)
+            response = JSONResponse({"detail": "Internal server error."}, status_code=500)
         if origin in allowed_origins or not origin:
             response.headers["Access-Control-Allow-Origin"] = origin or "*"
             response.headers["Access-Control-Allow-Credentials"] = "true"

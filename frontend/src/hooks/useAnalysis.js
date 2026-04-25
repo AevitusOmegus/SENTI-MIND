@@ -12,9 +12,16 @@ export function useAnalysis() {
     try {
       const data = await analyzeText(text);
       setResult(data);
-      return data;           // ← callers need this to log mood & save entry
+      return data;
     } catch (err) {
-      setError(err?.response?.data?.detail ?? "An unexpected error occurred.");
+      // err.response exists for HTTP errors (4xx/5xx from server)
+      // err.response is undefined for network failures (timeout, ECONNREFUSED)
+      const detail =
+        err?.response?.data?.detail ??
+        (err?.code === "ECONNABORTED" ? "Request timed out. Please try again." :
+        err?.message?.includes("Network Error") ? "Cannot reach server. Check your connection." :
+        "An unexpected error occurred.");
+      setError(detail);
       return null;
     } finally {
       setLoading(false);

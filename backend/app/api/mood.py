@@ -3,11 +3,11 @@ Mood API — save mood logs and return heatmap data.
 """
 from datetime import date, timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, field_validator
 from supabase import Client
 from app.api.auth_middleware import get_current_user, get_supabase_client
-from app.core.config import settings
+from app.core.constants import MENTAL_HEALTH_CATEGORIES
 
 router = APIRouter()
 
@@ -22,6 +22,13 @@ class MoodLogRequest(BaseModel):
     risk_level: Optional[str] = None
     risk_score: Optional[float] = None
     entry_id: Optional[str] = None
+
+    @field_validator("category")
+    @classmethod
+    def validate_category(cls, v: str) -> str:
+        if v not in MENTAL_HEALTH_CATEGORIES:
+            raise ValueError(f"category must be one of {MENTAL_HEALTH_CATEGORIES}")
+        return v
 
 
 @router.post("/", status_code=201)
@@ -43,6 +50,8 @@ async def log_mood(
         })
         .execute()
     )
+    if not result.data:
+        raise HTTPException(status_code=500, detail="Failed to save mood log.")
     return result.data[0]
 
 
@@ -74,7 +83,7 @@ async def get_heatmap(user_id: str = Depends(get_current_user)):
 
 @router.get("/trends")
 async def get_trends(
-    days: int = 30,
+    days: int = Query(30, ge=1, le=365),
     user_id: str = Depends(get_current_user),
 ):
     """Return mood trend data for line charts."""

@@ -2,20 +2,29 @@ import { Phone, MessageCircle, ExternalLink, Heart } from "lucide-react";
 
 const CRISIS_RESOURCES = [
   {
-    name: "988 Suicide & Crisis Lifeline",
-    phone: "988",
-    description: "Call or text for immediate 24/7 support",
+    name: "Umang Helpline (Pakistan)",
+    phone: "0317-4288665",
+    description: "Free mental health support, Mon–Sat 12–8pm",
     icon: Phone,
     color: "bg-medical-emergency",
     action: "Call Now",
   },
   {
-    name: "Crisis Text Line",
-    phone: "741741",
-    description: "Text HOME to connect with a counselor",
-    icon: MessageCircle,
+    name: "Rozan Counseling (Pakistan)",
+    phone: "051-2890505",
+    description: "Counseling & crisis intervention, Islamabad",
+    icon: Phone,
     color: "bg-sage-600",
-    action: "Text HOME",
+    action: "Call Now",
+  },
+  {
+    name: "International Crisis Text",
+    phone: "741741",
+    description: "Crisis Text Line — text HELLO for global support",
+    icon: MessageCircle,
+    color: "bg-indigo-600",
+    action: "Text HELLO",
+    href: "sms:741741?&body=HELLO",
   },
 ];
 
@@ -58,7 +67,7 @@ export default function CrisisAlertBanner({
                 return (
                   <a
                     key={resource.name}
-                    href={`tel:${resource.phone}`}
+                    href={resource.href ?? `tel:${resource.phone}`}
                     className="flex items-center gap-3 p-4 rounded-xl bg-white/10 hover:bg-white/20 transition-all group border border-white/10"
                   >
                     <div
@@ -85,10 +94,10 @@ export default function CrisisAlertBanner({
         <div className="mt-5 pt-5 border-t border-white/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <p className="text-sm text-rose-100 flex items-center gap-2">
             <span className="text-lg">💚</span>
-            You are not alone. Help is available 24/7, completely free and confidential.
+            You are not alone. Help is available — completely free and confidential.
           </p>
           <a
-            href="https://www.988lifeline.org"
+            href="https://www.iamwhole.pk"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-white font-medium flex items-center gap-1.5 hover:underline whitespace-nowrap px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
@@ -102,7 +111,7 @@ export default function CrisisAlertBanner({
       {/* Medical Disclaimer */}
       <div className="mt-3 p-3 bg-rose-50 rounded-xl border border-rose-200">
         <p className="text-xs text-rose-700 text-center">
-          ⚠️ If you're in immediate danger, please call <strong className="font-semibold">911</strong> or go to your nearest emergency room.
+          ⚠️ If you're in immediate danger, please call <strong className="font-semibold">115 (Rescue)</strong> or go to your nearest emergency room.
         </p>
       </div>
     </div>

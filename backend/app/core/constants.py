@@ -10,7 +10,7 @@ MENTAL_HEALTH_CATEGORIES = [
     "Stress",
     "Bipolar",
     "Normal",
-    "Personality Disorder",
+    "Personality disorder",
 ]
 
 # Risk Assessment Thresholds

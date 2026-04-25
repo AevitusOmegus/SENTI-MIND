@@ -8,12 +8,19 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "xiaomi/mimo-v2-omni"
+OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
 OPENROUTER_TIMEOUT = 30.0
+
+_SYSTEM_PROMPT = (
+    "You are SentiMind, a compassionate and clinically-informed mental health journaling assistant. "
+    "You respond to journal entries with empathy, validation, and gentle psychoeducation. "
+    "You never diagnose. For high-risk entries, you always recommend professional help or crisis resources. "
+    "Keep responses warm, non-judgmental, and professional. Do not use phrases like 'As an AI'."
+)
 
 
 def _build_prompt(text: str, emotions: list, clinical: dict, risk: dict) -> str:
-    top_emotions = ", ".join(f"{e['label']} ({e['score']:.0%})" for e in emotions[:3])  # type: ignore
+    top_emotions = ", ".join(f"{e['label']} ({e['score']:.0%})" for e in emotions[:2])
     category = clinical.get("category", "Unknown")
     category_conf = clinical.get("confidence", 0.0)
     risk_level = risk.get("level", "low")
@@ -27,28 +34,21 @@ def _build_prompt(text: str, emotions: list, clinical: dict, risk: dict) -> str:
         else ""
     )
 
-    return f"""You are a compassionate, clinically-informed mental-health analyst.
-
-Analyzed text: "{text}"
-
-Layer results:
-- Top emotions detected: {top_emotions}
-- Clinical classification: {category} (confidence {category_conf:.0%})
-- Risk level: {risk_level.upper()}
-- Crisis keywords found: {", ".join(triggers) if triggers else "none"}{safety_note}
-
-Respond in exactly this structure:
-**What You Are Feeling:** [detailed analysis of their current emotional state, based on the text and emotions detected]
-
-**Why You Might Be Feeling This:** [empathetic psychological reasoning behind their feelings]
-
-**Potential Issues/Risks:** [gentle discussion of any risks or raised issues from their text, if none, mention it subtly]
-
-**Exercises & Coping Strategies:**
-1. [Specific, actionable exercise or strategy]
-2. [Specific, actionable exercise or strategy]
-
-Keep the tone warm, empathetic, non-judgmental, and highly professional. Do not use phrases like "As an AI"."""
+    return (
+        f'Journal entry: "{text[:500]}"\n\n'
+        f"Detected emotions: {top_emotions}\n"
+        f"Clinical classification: {category} (confidence {category_conf:.0%})\n"
+        f"Risk level: {risk_level.upper()}\n"
+        f"Crisis keywords found: {', '.join(triggers) if triggers else 'none'}"
+        f"{safety_note}\n\n"
+        "Respond in exactly this structure:\n"
+        "**What You Are Feeling:** [detailed analysis of their current emotional state]\n\n"
+        "**Why You Might Be Feeling This:** [empathetic psychological reasoning]\n\n"
+        "**Potential Issues/Risks:** [gentle discussion of any risks, or note there are none]\n\n"
+        "**Exercises & Coping Strategies:**\n"
+        "1. [Specific, actionable exercise or strategy]\n"
+        "2. [Specific, actionable exercise or strategy]"
+    )
 
 
 async def generate_insight(text: str, emotions: list, clinical: dict, risk: dict) -> tuple[str, dict | None]:
@@ -64,36 +64,43 @@ async def generate_insight(text: str, emotions: list, clinical: dict, risk: dict
     }
     payload = {
         "model": OPENROUTER_MODEL,
-        "messages": [{"role": "user", "content": _build_prompt(text, emotions, clinical, risk)}],
+        "messages": [
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "user", "content": _build_prompt(text, emotions, clinical, risk)},
+        ],
         "max_tokens": 512,
         "temperature": 0.7,
     }
 
-    try:
-        async with httpx.AsyncClient(timeout=OPENROUTER_TIMEOUT) as client:
-            response = await client.post(OPENROUTER_URL, headers=headers, json=payload)
+    for attempt in range(2):
+        try:
+            async with httpx.AsyncClient(timeout=OPENROUTER_TIMEOUT) as client:
+                response = await client.post(OPENROUTER_URL, headers=headers, json=payload)
 
-        if response.status_code != 200:
-            logger.warning("OpenRouter returned %s: %s", response.status_code, response.text)
-            return _fallback_insight(clinical), None
+            if response.status_code != 200:
+                logger.warning("OpenRouter returned %s: %s", response.status_code, response.text)
+                if attempt == 0:
+                    continue
+                return _fallback_insight(clinical), None
 
-        data = response.json()
-        insight_text = data["choices"][0]["message"]["content"].strip()
-        usage = data.get("usage", {})
-        return insight_text, {"model": data.get("model", OPENROUTER_MODEL), "usage": usage}
+            data = response.json()
+            insight_text = data["choices"][0]["message"]["content"].strip()
+            usage = data.get("usage", {})
+            return insight_text, {"model": data.get("model", OPENROUTER_MODEL), "usage": usage}
 
-    except asyncio.TimeoutError:
-        logger.error("OpenRouter timed out after %ss", OPENROUTER_TIMEOUT)
-        return _fallback_insight(clinical), None
-    except httpx.HTTPError as exc:
-        logger.error("OpenRouter HTTP error: %s", exc)
-        return _fallback_insight(clinical), None
-    except (KeyError, IndexError) as exc:
-        logger.error("OpenRouter unexpected response shape: %s", exc)
-        return _fallback_insight(clinical), None
-    except Exception as exc:
-        logger.exception("OpenRouter unexpected error: %s", exc)
-        return _fallback_insight(clinical), None
+        except (asyncio.TimeoutError, httpx.TimeoutException):
+            logger.error("OpenRouter timed out (attempt %d)", attempt + 1)
+        except httpx.HTTPError as exc:
+            logger.error("OpenRouter HTTP error: %s", exc)
+        except (KeyError, IndexError) as exc:
+            logger.error("OpenRouter unexpected response shape: %s", exc)
+        except Exception as exc:
+            logger.exception("OpenRouter unexpected error: %s", exc)
+
+        if attempt == 0:
+            await asyncio.sleep(1.5)
+
+    return _fallback_insight(clinical), None
 
 
 def _fallback_insight(clinical: dict) -> str:

@@ -149,6 +149,7 @@ def grid_search(X_train, y_train) -> dict:
     param_grid = {
         "tfidf__ngram_range": [(1, 2), (1, 3)],
         "tfidf__max_features": [15000, 20000],
+        "tfidf__min_df": [1, 2],
         "clf__estimator__C": [0.5, 1.0, 2.0, 5.0],
     }
 
@@ -160,7 +161,6 @@ def grid_search(X_train, y_train) -> dict:
             lowercase=True,
             strip_accents="unicode",
             sublinear_tf=True,
-            min_df=1,
             max_df=0.95,
         )),
         ("clf", CalibratedClassifierCV(
@@ -208,7 +208,7 @@ def train():
             lowercase=True,
             strip_accents="unicode",
             sublinear_tf=True,
-            min_df=1,
+            min_df=best_params.get("tfidf__min_df", 1),
             max_df=0.95,
             ngram_range=best_params["tfidf__ngram_range"],
             max_features=best_params["tfidf__max_features"],

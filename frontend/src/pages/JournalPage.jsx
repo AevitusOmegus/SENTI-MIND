@@ -16,10 +16,12 @@ const CATEGORY_CONFIG = {
   Bipolar: { color: "text-indigo-700", bg: "bg-indigo-50", icon: "⚡", label: "Bipolar", border: "border-indigo-200" },
   Depression: { color: "text-medical-severe", bg: "bg-rose-50", icon: "☁️", label: "Depression", border: "border-rose-200" },
   Suicidal: { color: "text-medical-emergency", bg: "bg-rose-100", icon: "🚨", label: "Suicidal", border: "border-rose-300" },
-  "Personality Disorder": { color: "text-violet-700", bg: "bg-violet-50", icon: "🎭", label: "Personality Disorder", border: "border-violet-200" },
+  "Personality disorder": { color: "text-violet-700", bg: "bg-violet-50", icon: "🎭", label: "Personality Disorder", border: "border-violet-200" },
 };
 
 const DEFAULT_CAT = { color: "text-warm-600", bg: "bg-warm-50", icon: "💭", label: "Unknown", border: "border-warm-200" };
+
+const MAX_CHARS = 5000;
 
 export default function JournalPage() {
   const [text, setText] = useState("");
@@ -111,7 +113,9 @@ export default function JournalPage() {
           <form onSubmit={handleSubmit} className="medical-card p-4 sm:p-6 animate-medical-slide-up">
             <label className="medical-label flex justify-between items-center mb-3">
               <span>How are you feeling?</span>
-              <span className="text-warm-400 font-normal normal-case text-xs">({text.length} chars)</span>
+              <span className={`font-normal normal-case text-xs ${text.length > MAX_CHARS * 0.9 ? "text-rose-500 font-semibold" : "text-warm-400"}`}>
+                {text.length}/{MAX_CHARS}
+              </span>
             </label>
             
             <textarea
@@ -119,6 +123,7 @@ export default function JournalPage() {
               onChange={e => setText(e.target.value)}
               placeholder="Start typing your entry here..."
               rows={6}
+              maxLength={MAX_CHARS}
               disabled={loading}
               className="medical-input resize-none text-base"
             />

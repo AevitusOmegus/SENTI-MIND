@@ -540,6 +540,39 @@ def main():
         all_data.extend(samples)
         print(f"  {label}: {len(samples)} samples (from pool of {len(sentences)})")
 
+    # --- Short-text augmentation ---
+    # Real journal entries are often 1-5 words. The model fails on these.
+    # Adding targeted short-text examples per class improves short-input accuracy.
+    short_text_samples: list[tuple[str, str]] = [
+        # Depression
+        ("feeling low", "Depression"), ("so empty", "Depression"), ("nothing matters", "Depression"),
+        ("completely numb", "Depression"), ("no energy", "Depression"), ("lost motivation", "Depression"),
+        ("crying again", "Depression"), ("feel invisible", "Depression"), ("stuck in darkness", "Depression"),
+        # Anxiety
+        ("panic attack", "Anxiety"), ("cant breathe", "Anxiety"), ("always worried", "Anxiety"),
+        ("mind racing", "Anxiety"), ("chest tight", "Anxiety"), ("scared again", "Anxiety"),
+        ("constant dread", "Anxiety"), ("overthinking everything", "Anxiety"), ("on edge", "Anxiety"),
+        # Suicidal
+        ("want to die", "Suicidal"), ("end it all", "Suicidal"), ("no point anymore", "Suicidal"),
+        ("cant go on", "Suicidal"), ("done with life", "Suicidal"), ("ready to go", "Suicidal"),
+        # Stress
+        ("completely overwhelmed", "Stress"), ("too much pressure", "Stress"), ("burning out", "Stress"),
+        ("exhausted from work", "Stress"), ("cant cope", "Stress"), ("deadline stress", "Stress"),
+        ("no time to breathe", "Stress"), ("running on empty", "Stress"),
+        # Bipolar
+        ("mood swings again", "Bipolar"), ("manic episode", "Bipolar"), ("highs and lows", "Bipolar"),
+        ("crashed after euphoria", "Bipolar"), ("cycling badly", "Bipolar"),
+        # Personality disorder
+        ("dont know who I am", "Personality disorder"), ("pushing everyone away", "Personality disorder"),
+        ("intense abandonment fear", "Personality disorder"), ("identity confusion", "Personality disorder"),
+        # Normal
+        ("good day today", "Normal"), ("feeling okay", "Normal"), ("life is fine", "Normal"),
+        ("nothing special", "Normal"), ("all good", "Normal"), ("relaxed today", "Normal"),
+        ("happy and content", "Normal"), ("productive day", "Normal"),
+    ]
+    all_data.extend(short_text_samples)
+    print(f"  Short-text augmentation: {len(short_text_samples)} samples added")
+
     random.shuffle(all_data)
 
     output_path = Path(__file__).parent.parent / "data" / "Combined Data.csv"
@@ -551,7 +584,7 @@ def main():
         writer.writerows(all_data)
 
     total = len(all_data)
-    print(f"\nTotal samples: {total} ({SAMPLES_PER_CLASS} per class × {len(categories)} classes)")
+    print(f"\nTotal samples: {total} ({SAMPLES_PER_CLASS} per class × {len(categories)} classes + {len(short_text_samples)} short-text)")
     print(f"Saved to: {output_path}")
 
 

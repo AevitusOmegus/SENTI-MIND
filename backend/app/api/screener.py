@@ -1,8 +1,8 @@
 """
 Screener API — GAD-2 / PHQ-2 clinical screening tools.
 """
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, Field, field_validator
 from supabase import Client
 from app.api.auth_middleware import get_current_user, get_supabase_client
 from app.core.config import settings
@@ -17,6 +17,14 @@ def _sb() -> Client:
 class ScreenerSubmit(BaseModel):
     gad2_answers: list[int] = Field(..., min_length=2, max_length=2)
     phq2_answers: list[int] = Field(..., min_length=2, max_length=2)
+
+    @field_validator("gad2_answers", "phq2_answers")
+    @classmethod
+    def validate_answer_range(cls, v: list[int]) -> list[int]:
+        for val in v:
+            if val < 0 or val > 3:
+                raise ValueError("Each answer must be between 0 and 3.")
+        return v
 
 
 def _interpret_gad2(score: int) -> str:
@@ -51,6 +59,8 @@ async def submit_screener(
         })
         .execute()
     )
+    if not result.data:
+        raise HTTPException(status_code=500, detail="Failed to save screener results.")
 
     return {
         **result.data[0],

@@ -9,52 +9,62 @@ _bearer = HTTPBearer(auto_error=False)
 
 current_token: ContextVar[str] = ContextVar("current_token", default="")
 
+# Shared client for JWT verification — no user context, created once at import time
+_base_client: Client | None = None
+
+
+def _get_base_client() -> Client:
+    global _base_client
+    if _base_client is None:
+        _base_client = create_client(settings.SUPABASE_URL, settings.SUPABASE_ANON_KEY)
+    return _base_client
+
+
 def get_supabase_client() -> Client:
     token = current_token.get()
     headers = {"Authorization": f"Bearer {token}"} if token else {}
     return create_client(
-        settings.SUPABASE_URL, 
-        settings.SUPABASE_ANON_KEY, 
+        settings.SUPABASE_URL,
+        settings.SUPABASE_ANON_KEY,
         options=ClientOptions(headers=headers)
     )
+
 
 async def get_current_user(
     creds: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
 ) -> str:
-    """Require a valid Supabase JWT and return the user_id."""
     if not creds:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    # Use context-free client for initial verification
-    supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_ANON_KEY)
+
+    supabase = _get_base_client()
     try:
         user_response = supabase.auth.get_user(creds.credentials)
-        if hasattr(user_response, 'user') and user_response.user:
+        if hasattr(user_response, "user") and user_response.user:
             current_token.set(creds.credentials)
             return user_response.user.id
         raise Exception("Invalid user response")
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid or expired token. {str(e)}",
+            detail="Invalid or expired token.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 async def get_optional_user(
     creds: Optional[HTTPAuthorizationCredentials] = Depends(_bearer),
 ) -> Optional[str]:
-    """Return user_id if JWT is valid, else None."""
     if not creds:
         return None
-        
-    supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_ANON_KEY)
+
+    supabase = _get_base_client()
     try:
         user_response = supabase.auth.get_user(creds.credentials)
-        if hasattr(user_response, 'user') and user_response.user:
+        if hasattr(user_response, "user") and user_response.user:
             current_token.set(creds.credentials)
             return user_response.user.id
         return None

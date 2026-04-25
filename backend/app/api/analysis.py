@@ -1,3 +1,6 @@
+import asyncio
+import logging
+
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import (
     AnalysisRequest, AnalysisResponse,
@@ -11,7 +14,10 @@ from app.services.ner import extract_entities
 from app.services.risk_engine import assess_risk
 from app.services.preprocessor import clean_text
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
+
+MAX_TEXT_LENGTH = 5000  # chars — prevents OOM on spaCy and runaway LLM prompts
 
 
 @router.post("/", response_model=AnalysisResponse)
@@ -19,14 +25,22 @@ async def analyze_text(payload: AnalysisRequest):
     raw_text = payload.text.strip()
     if not raw_text:
         raise HTTPException(status_code=422, detail="Text cannot be empty.")
+    if len(raw_text) > MAX_TEXT_LENGTH:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Text exceeds maximum length of {MAX_TEXT_LENGTH} characters."
+        )
 
     try:
         cleaned_text, emoji_tokens = clean_text(raw_text)
 
-        raw_emotions = await detect_emotions(cleaned_text)
-        emotions = [EmotionResult(label=e["label"], score=e["score"]) for e in raw_emotions]
+        # Run emotion detection and CPU-bound classifier concurrently
+        raw_emotions, raw_clinical = await asyncio.gather(
+            detect_emotions(cleaned_text),
+            asyncio.to_thread(classifier.predict, cleaned_text),
+        )
 
-        raw_clinical = classifier.predict(cleaned_text)
+        emotions = [EmotionResult(label=e["label"], score=e["score"]) for e in raw_emotions]
         clinical = ClinicalResult(
             category=raw_clinical["category"],
             confidence=raw_clinical["confidence"],
@@ -60,15 +74,16 @@ async def analyze_text(payload: AnalysisRequest):
                 details={"api_endpoint": "router.huggingface.co"}
             ),
             ModelUsed(
-                name="ClinicalClassifier (LinearSVC TF-IDF)",
+                name="ClinicalClassifier (LinearSVC + TF-IDF)",
                 type="clinical",
                 provider="local",
+                details={"version": getattr(classifier, "_model_version", "v2")}
             )
         ]
         if llm_details:
             models_used.append(
                 ModelUsed(
-                    name=llm_details.get("model", "xiaomi/mimo-v2-omni"),
+                    name=llm_details.get("model", "meta-llama/llama-3.3-70b-instruct:free"),
                     type="llm",
                     provider="openrouter",
                     details=llm_details.get("usage", {})
@@ -89,4 +104,5 @@ async def analyze_text(payload: AnalysisRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.exception("Unhandled error in /analysis/")
+        raise HTTPException(status_code=500, detail="Analysis failed. Please try again.")

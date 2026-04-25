@@ -8,7 +8,7 @@ const MOOD_COLORS = {
   Bipolar: "bg-indigo-400",
   Depression: "bg-rose-400",
   Suicidal: "bg-rose-600",
-  "Personality Disorder": "bg-violet-400",
+  "Personality disorder": "bg-violet-400",
 };
 
 export default function MoodHeatmapPage() {

@@ -1,9 +1,14 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
 
 class AnalysisRequest(BaseModel):
-    text: str
+    text: str = Field(..., min_length=1, max_length=5000)
+
+    @field_validator("text")
+    @classmethod
+    def strip_text(cls, v: str) -> str:
+        return v.strip()
 
 
 class EmotionResult(BaseModel):

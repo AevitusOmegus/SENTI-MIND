@@ -80,46 +80,52 @@ class ClinicalTextPreprocessor:
         }
 
     def preprocess(self, text: str) -> str:
-        """Apply comprehensive preprocessing."""
         if not isinstance(text, str):
             return ""
 
-        # Lowercase and strip
-        text = text.lower().strip()
+        original = text.lower().strip()
 
-        # Handle negations
+        # Check crisis indicators on the ORIGINAL text before negation substitution,
+        # then suppress them if they also appear in a negated context.
+        crisis_markers: list[str] = []
+        for indicator, weight in self.crisis_indicators.items():
+            if indicator not in original:
+                continue
+            # Simple negation check: does a negation word appear within 15 chars before the indicator?
+            idx = original.find(indicator)
+            window = original[max(0, idx - 15):idx]
+            negation_re = re.compile(
+                r"\b(not|never|no longer|don'?t|doesn'?t|didn'?t|won'?t|wouldn'?t|haven'?t|hasn'?t)\b"
+            )
+            if negation_re.search(window):
+                continue  # negated — skip crisis marker
+            crisis_markers.append(f" CRISIS_{indicator.replace(' ', '_')}_W{int(weight * 10)} ")
+
+        # Now apply negation substitution to the text
+        text = original
         for pattern in self.negation_patterns:
             text = re.sub(
                 pattern,
                 lambda m: " NEG_" + m.group(0).replace(' ', '_').replace("'", '').replace('"', '') + " ",
-                text
+                text,
             )
 
-        # Add crisis indicator markers (high-severity phrases only)
-        for indicator, weight in self.crisis_indicators.items():
-            if indicator in text:
-                text += f" CRISIS_{indicator.replace(' ', '_')}_W{int(weight*10)} "
+        # Append crisis markers (only for non-negated indicators)
+        text += "".join(crisis_markers)
 
-        # Normalize whitespace
         text = re.sub(r'\s+', ' ', text).strip()
-
         return text
 
 
 class ClinicalClassifier:
-    """
-    Clinical classifier for mental health text classification.
-    Uses a calibrated LinearSVC model with TF-IDF features.
-    """
-
     def __init__(self) -> None:
         self._model = None
         self._vectorizer = None
         self._preprocessor = ClinicalTextPreprocessor()
         self._classes = None
+        self._model_version: str = "unknown"
 
     def load(self) -> None:
-        """Load model and vectorizer from disk."""
         if not MODEL_PATH.exists():
             raise FileNotFoundError(f"Model artifact not found: {MODEL_PATH}")
         if not VECTORIZER_PATH.exists():
@@ -137,7 +143,20 @@ class ClinicalClassifier:
             raise RuntimeError(f"Unexpected vectorizer type: {type(self._vectorizer)}")
 
         self._classes = self._model.classes_
-        logger.info("ClinicalClassifier v2 loaded. Classes: %s", list(self._classes))
+
+        # Load version from metadata if present
+        metadata_path = _data_dir / "model_metadata.json"
+        if metadata_path.exists():
+            try:
+                import json
+                meta = json.loads(metadata_path.read_text())
+                self._model_version = meta.get("version", "v2")
+            except Exception:
+                self._model_version = "v2"
+        else:
+            self._model_version = "v2"
+
+        logger.info("ClinicalClassifier %s loaded. Classes: %s", self._model_version, list(self._classes))
 
     def unload(self) -> None:
         """Unload model and free memory."""
@@ -169,7 +188,9 @@ class ClinicalClassifier:
         # Check for meaningful content
         cleaned = re.sub(r'[^\w\s]', '', text.lower())
         words = [w for w in cleaned.split() if len(w) > 1]
-        if len(words) < 1:
+        # Require at least 2 meaningful words to attempt classification
+        # Single words like "hi", "ok" produce near-random probability distributions
+        if len(words) < 2:
             return dict(_UNKNOWN_RESULT)
 
         # Preprocess text

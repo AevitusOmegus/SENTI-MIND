@@ -36,7 +36,7 @@ const CATEGORY_CONFIG = {
     bg: "bg-indigo-50",
     border: "border-indigo-200",
   },
-  "Personality Disorder": {
+  "Personality disorder": {
     color: "bg-violet-500",
     text: "text-violet-700",
     bg: "bg-violet-50",
@@ -51,7 +51,7 @@ const CATEGORY_ICONS = {
   Depression: "☁️",
   Suicidal: "🚨",
   Bipolar: "⚡",
-  "Personality Disorder": "🎭",
+  "Personality disorder": "🎭",
 };
 
 export default function ClinicalConfidenceBars({
