@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SentiBotFAB from "../components/SentiBotFAB";
 
 const NAV_LINKS = [
   {
@@ -59,6 +60,15 @@ const NAV_LINKS = [
       </svg>
     ),
   },
+  {
+    to: "chat",
+    label: "AI Chat",
+    icon: (
+      <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+      </svg>
+    ),
+  },
 ];
 
 // Bottom tab bar shows only first 5 links. Gratitude goes into sidebar overflow.
@@ -90,7 +100,10 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-sage-50 overflow-hidden">
+    <div 
+      className="flex h-screen bg-sage-50 overflow-hidden"
+      style={{ backgroundImage: "url('/dashboard-texture.png')", backgroundRepeat: "repeat", backgroundSize: "auto" }}
+    >
 
       {/* =====================================================================
           DESKTOP SIDEBAR (hidden on mobile)
@@ -300,6 +313,9 @@ export default function DashboardLayout() {
             <span>More</span>
           </button>
         </nav>
+
+        {/* SentiBot floating action button — navigates to AI Chat */}
+        <SentiBotFAB />
       </div>
     </div>
   );

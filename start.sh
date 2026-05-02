@@ -9,18 +9,21 @@ echo "  SENTI-MIND Mental Health Analyzer"
 echo "========================================"
 echo ""
 
+# Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
 BACKEND_URL="http://127.0.0.1:8000"
 FRONTEND_URL="http://127.0.0.1:5173"
 
+# Function to check if a port is in use
 check_port() {
     lsof -i:$1 > /dev/null 2>&1
 }
 
+# Function to cleanup processes on exit
 cleanup() {
     echo ""
     echo "Shutting down services..."
@@ -37,6 +40,7 @@ cleanup() {
 
 trap cleanup INT TERM
 
+# Check and install backend dependencies
 echo -e "${YELLOW}Checking backend environment...${NC}"
 if [ ! -d "backend/.venv" ]; then
     echo -e "${YELLOW}Creating backend virtual environment...${NC}"
@@ -51,12 +55,14 @@ if [ ! -d "backend/.venv" ]; then
     echo -e "${GREEN}Backend setup complete!${NC}"
 fi
 
+# Ensure .env exists
 if [ ! -f ".env" ] && [ -f ".env.example" ]; then
     echo -e "${YELLOW}Creating .env from .env.example...${NC}"
     cp .env.example .env
-    echo -e "${RED}IMPORTANT: Please update .env with your API keys${NC}"
+    echo -e "${RED}IMPORTANT: Please update .env with your API keys (HF_API_TOKEN, etc.)${NC}"
 fi
 
+# Check and install frontend dependencies
 echo -e "${YELLOW}Checking frontend environment...${NC}"
 if [ ! -d "frontend/node_modules" ]; then
     echo -e "${YELLOW}Installing frontend dependencies...${NC}"
@@ -69,6 +75,7 @@ fi
 echo "Checking services..."
 echo ""
 
+# Start Backend
 if check_port 8000; then
     echo -e "${YELLOW}Backend already running on port 8000${NC}"
 else
@@ -79,6 +86,7 @@ else
     cd ..
     echo -e "${GREEN}Backend PID: $BACKEND_PID${NC}"
 
+    # Wait for backend to be ready
     echo -n "Waiting for backend..."
     for i in {1..30}; do
         if curl -s http://127.0.0.1:8000/health > /dev/null 2>&1; then
@@ -93,6 +101,7 @@ fi
 
 echo ""
 
+# Start Frontend
 if check_port 5173; then
     echo -e "${YELLOW}Frontend already running on port 5173${NC}"
 else
@@ -103,6 +112,7 @@ else
     cd ..
     echo -e "${GREEN}Frontend PID: $FRONTEND_PID${NC}"
 
+    # Wait for frontend
     echo -n "Waiting for frontend..."
     for i in {1..30}; do
         if curl -s http://127.0.0.1:5173 > /dev/null 2>&1; then
@@ -129,6 +139,7 @@ echo ""
 echo "Press Ctrl+C to stop all services"
 echo "========================================"
 
+# Keep script running
 tail -f /dev/null &
 TAIL_PID=$!
 wait $TAIL_PID

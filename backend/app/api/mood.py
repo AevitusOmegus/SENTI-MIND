@@ -1,19 +1,17 @@
 """
 Mood API — save mood logs and return heatmap data.
 """
+import logging
 from datetime import date, timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from supabase import Client
-from app.api.auth_middleware import get_current_user, get_supabase_client
-from app.core.config import settings
+from app.api.auth_middleware import get_current_user, get_authenticated_client
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
-
-
-def _sb() -> Client:
-    return get_supabase_client()
 
 
 class MoodLogRequest(BaseModel):
@@ -28,67 +26,81 @@ class MoodLogRequest(BaseModel):
 async def log_mood(
     payload: MoodLogRequest,
     user_id: str = Depends(get_current_user),
+    sb: Client = Depends(get_authenticated_client),
 ):
-    sb = _sb()
-    result = (
-        sb.table("mood_logs")
-        .insert({
-            "user_id": user_id,
-            "category": payload.category,
-            "confidence": payload.confidence,
-            "risk_level": payload.risk_level,
-            "risk_score": payload.risk_score,
-            "entry_id": payload.entry_id,
-            "logged_date": date.today().isoformat(),
-        })
-        .execute()
-    )
-    return result.data[0]
+    try:
+        result = (
+            sb.table("mood_logs")
+            .insert({
+                "user_id": user_id,
+                "category": payload.category,
+                "confidence": payload.confidence,
+                "risk_level": payload.risk_level,
+                "risk_score": payload.risk_score,
+                "entry_id": payload.entry_id,
+                "logged_date": date.today().isoformat(),
+            })
+            .execute()
+        )
+        return result.data[0]
+    except Exception as e:
+        logger.exception("Failed to log mood for user %s", user_id)
+        raise HTTPException(status_code=500, detail="Failed to log mood.")
 
 
 @router.get("/heatmap")
-async def get_heatmap(user_id: str = Depends(get_current_user)):
+async def get_heatmap(
+    user_id: str = Depends(get_current_user),
+    sb: Client = Depends(get_authenticated_client),
+):
     """Return the last 30 days of mood logs (one entry per day — latest wins)."""
-    sb = _sb()
-    since = (date.today() - timedelta(days=29)).isoformat()
-    result = (
-        sb.table("mood_logs")
-        .select("logged_date, category, risk_level, confidence")
-        .eq("user_id", user_id)
-        .gte("logged_date", since)
-        .order("logged_date", desc=False)
-        .execute()
-    )
+    try:
+        since = (date.today() - timedelta(days=29)).isoformat()
+        result = (
+            sb.table("mood_logs")
+            .select("logged_date, category, risk_level, confidence")
+            .eq("user_id", user_id)
+            .gte("logged_date", since)
+            .order("logged_date", desc=False)
+            .execute()
+        )
 
-    # Collapse to one entry per day (latest)
-    by_date: dict = {}
-    for row in result.data:
-        by_date[row["logged_date"]] = row
+        # Collapse to one entry per day (latest)
+        by_date: dict = {}
+        for row in result.data:
+            by_date[row["logged_date"]] = row
 
-    # Build trend feedback
-    entries = list(by_date.values())
-    feedback = _generate_feedback(entries)
+        # Build trend feedback
+        entries = list(by_date.values())
+        feedback = _generate_feedback(entries)
 
-    return {"days": list(by_date.values()), "feedback": feedback}
+        return {"days": list(by_date.values()), "feedback": feedback}
+    except Exception as e:
+        logger.exception("Failed to get mood heatmap for user %s", user_id)
+        raise HTTPException(status_code=500, detail="Failed to retrieve mood heatmap.")
 
 
 @router.get("/trends")
 async def get_trends(
     days: int = 30,
     user_id: str = Depends(get_current_user),
+    sb: Client = Depends(get_authenticated_client),
 ):
     """Return mood trend data for line charts."""
-    sb = _sb()
-    since = (date.today() - timedelta(days=days - 1)).isoformat()
-    result = (
-        sb.table("mood_logs")
-        .select("logged_date, category, confidence, risk_score")
-        .eq("user_id", user_id)
-        .gte("logged_date", since)
-        .order("logged_date", desc=False)
-        .execute()
-    )
-    return result.data
+    try:
+        since = (date.today() - timedelta(days=days - 1)).isoformat()
+        result = (
+            sb.table("mood_logs")
+            .select("logged_date, category, confidence, risk_score")
+            .eq("user_id", user_id)
+            .gte("logged_date", since)
+            .order("logged_date", desc=False)
+            .execute()
+        )
+        return result.data
+    except Exception as e:
+        logger.exception("Failed to get mood trends for user %s", user_id)
+        raise HTTPException(status_code=500, detail="Failed to retrieve mood trends.")
 
 
 def _generate_feedback(entries: list) -> str:
@@ -96,7 +108,7 @@ def _generate_feedback(entries: list) -> str:
         return "No mood data yet. Start journaling to see your trends!"
 
     POSITIVE = {"Normal"}
-    NEGATIVE = {"Depression", "Suicidal", "Anxiety", "Bipolar", "Stress", "Personality disorder"}
+    NEGATIVE = {"Depression", "Suicidal", "Anxiety", "Bipolar", "Stress", "Personality Disorder"}
 
     recent = entries[-7:]  # last 7 days
     positive_count = sum(1 for e in recent if e["category"] in POSITIVE)

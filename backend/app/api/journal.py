@@ -71,6 +71,10 @@ async def list_entries(
         raise HTTPException(status_code=500, detail="Failed to retrieve journal entries.")
 
 
+# --- Gratitude Snippets ---
+# NOTE: These MUST be declared before /{entry_id} so FastAPI doesn't
+# match "gratitude" as an entry_id.
+
 @router.post("/gratitude/", status_code=201)
 async def save_gratitude(
     payload: GratitudeSaveRequest,
@@ -128,6 +132,8 @@ async def delete_gratitude(
         logger.exception("Failed to delete gratitude snippet %s for user %s", snippet_id, user_id)
         raise HTTPException(status_code=500, detail="Failed to delete gratitude snippet.")
 
+
+# --- Single entry operations (MUST come after static sub-paths) ---
 
 @router.get("/{entry_id}")
 async def get_entry(

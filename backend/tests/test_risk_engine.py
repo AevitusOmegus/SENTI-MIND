@@ -32,6 +32,7 @@ def test_medium_risk_anxiety():
         "top_categories": [{"category": "Anxiety", "confidence": 0.8}, {"category": "Suicidal", "confidence": 0.1}],
     }
     result = assess_risk("I am so stressed about exams.", emotions, clinical)
+    # Anxiety without crisis keywords correctly scores as low-medium risk
     assert result["level"] in ("low", "medium")
 
 
@@ -44,18 +45,24 @@ def test_keyword_risk_boost():
 
 
 def test_negated_crisis_reduces_risk():
+    """'I am NOT suicidal' should score much lower than 'I am suicidal'."""
     emotions = [{"label": "neutral", "score": 0.8}]
     clinical = {"category": "Stress", "confidence": 0.6, "top_categories": [{"category": "Suicidal", "confidence": 0.1}]}
+
     result_negated = assess_risk("I am not suicidal just stressed", emotions, clinical)
     result_direct = assess_risk("I am suicidal and want to die", emotions, clinical)
+
     assert result_negated["score"] < result_direct["score"]
 
 
 def test_past_tense_reduces_risk():
+    """'I was suicidal years ago' should score lower than 'I am suicidal'."""
     emotions = [{"label": "neutral", "score": 0.8}]
     clinical = {"category": "Normal", "confidence": 0.7, "top_categories": [{"category": "Suicidal", "confidence": 0.05}]}
+
     result_past = assess_risk("I was suicidal years ago but recovered", emotions, clinical)
     result_present = assess_risk("I am suicidal right now", emotions, clinical)
+
     assert result_past["score"] < result_present["score"]
 
 

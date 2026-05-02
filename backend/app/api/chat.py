@@ -11,7 +11,7 @@ router = APIRouter()
 agent_service = AgentService()
 
 class ChatMessage(BaseModel):
-    role: str
+    role: str # "user" or "model"
     parts: List[str]
 
 class ChatRequest(BaseModel):
@@ -24,6 +24,7 @@ async def chat_with_agent(
     user_id: str = Depends(get_current_user),
 ):
     try:
+        # Convert history format if provided
         formatted_history = []
         if payload.history:
             for msg in payload.history:
@@ -31,7 +32,7 @@ async def chat_with_agent(
                     "role": msg.role,
                     "parts": msg.parts
                 })
-
+        
         response_text = await agent_service.chat(
             user_id=user_id,
             message=payload.message,

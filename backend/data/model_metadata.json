@@ -1,8 +1,8 @@
 {
-  "trained_at": "2026-04-10T21:02:33.225805",
-  "model_version": "v3",
-  "samples_train": 1120,
-  "samples_test": 280,
+  "trained_at": "2026-05-02T15:45:38.203510",
+  "model_version": "v4",
+  "samples_train": 2240,
+  "samples_test": 560,
   "classes": [
     "Anxiety",
     "Bipolar",
@@ -20,56 +20,57 @@
     ],
     "max_features": 15000
   },
-  "accuracy": 0.9857142857142858,
-  "macro_f1": 0.9857053515590101,
-  "weighted_f1": 0.9857053515590102,
-  "cv_f1_macro_mean": 0.9784972215773733,
-  "cv_f1_macro_std": 0.015509272284862367,
-  "grid_search_best_cv_f1": 0.9559747258472486,
+  "accuracy": 0.8053571428571429,
+  "macro_f1": 0.8062074756581,
+  "weighted_f1": 0.8062074756581001,
+  "cv_f1_macro_mean": 0.7903545780211108,
+  "cv_f1_macro_std": 0.02765639923331902,
+  "grid_search_best_cv_f1": 0.774001359004904,
   "per_class_metrics": {
     "Anxiety": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
-      "support": 40
+      "precision": 0.8974358974358975,
+      "recall": 0.875,
+      "f1": 0.8860759493670886,
+      "support": 80
     },
     "Bipolar": {
-      "precision": 1.0,
-      "recall": 0.95,
-      "f1": 0.9743589743589743,
-      "support": 40
+      "precision": 0.821917808219178,
+      "recall": 0.75,
+      "f1": 0.7843137254901961,
+      "support": 80
     },
     "Depression": {
-      "precision": 0.9523809523809523,
-      "recall": 1.0,
-      "f1": 0.975609756097561,
-      "support": 40
+      "precision": 0.6265060240963856,
+      "recall": 0.65,
+      "f1": 0.6380368098159509,
+      "support": 80
     },
     "Normal": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
-      "support": 40
+      "precision": 0.813953488372093,
+      "recall": 0.875,
+      "f1": 0.8433734939759037,
+      "support": 80
     },
     "Personality disorder": {
-      "precision": 0.9523809523809523,
-      "recall": 1.0,
-      "f1": 0.975609756097561,
-      "support": 40
+      "precision": 0.7415730337078652,
+      "recall": 0.825,
+      "f1": 0.7810650887573964,
+      "support": 80
     },
     "Stress": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
-      "support": 40
+      "precision": 0.88,
+      "recall": 0.825,
+      "f1": 0.8516129032258064,
+      "support": 80
     },
     "Suicidal": {
-      "precision": 1.0,
-      "recall": 0.95,
-      "f1": 0.9743589743589743,
-      "support": 40
+      "precision": 0.881578947368421,
+      "recall": 0.8375,
+      "f1": 0.8589743589743589,
+      "support": 80
     }
   },
+  "adversarial_spot_check": "48/51",
   "has_calibration": true,
-  "preprocessing": "negation_handling + crisis_markers (no crude keyword\u2192class markers)"
+  "preprocessing": "shared app.core.preprocessing v3 (contractions + negation_scope + intensity + temporal + crisis)"
 }

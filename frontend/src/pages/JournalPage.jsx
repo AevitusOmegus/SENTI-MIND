@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAnalysis } from "../hooks/useAnalysis";
 import { saveJournalEntry, saveGratitude } from "../services/journalService";
 import { logMood } from "../services/moodService";
@@ -8,6 +8,7 @@ import RiskBadge from "../components/RiskBadge";
 import InsightModal from "../components/InsightModal";
 import CrisisAlertBanner from "../components/CrisisAlertBanner";
 import GratitudeModal from "../components/GratitudeModal";
+import SentiBotAvatar from "../components/SentiBotAvatar";
 
 const CATEGORY_CONFIG = {
   Normal: { color: "text-sage-700", bg: "bg-sage-50", icon: "🌿", label: "Normal", border: "border-sage-200" },
@@ -22,6 +23,7 @@ const CATEGORY_CONFIG = {
 const DEFAULT_CAT = { color: "text-warm-600", bg: "bg-warm-50", icon: "💭", label: "Unknown", border: "border-warm-200" };
 
 export default function JournalPage() {
+  const navigate = useNavigate();
   const [text, setText] = useState("");
   const [showInsight, setShowInsight] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
@@ -134,8 +136,12 @@ export default function JournalPage() {
                 {result ? (
                   <button type="button" onClick={handleReset} className="medical-btn medical-btn-secondary py-2 px-4 text-sm shadow-sm">New Entry</button>
                 ) : (
-                  <button type="submit" disabled={loading || !text.trim()} className="medical-btn medical-btn-primary py-2 px-5 text-sm shadow-md">
-                    {loading ? "Analyzing..." : "Analyze & Save"}
+                  <button type="submit" disabled={loading || !text.trim()} className="medical-btn medical-btn-primary py-2 px-5 text-sm shadow-md flex items-center gap-2">
+                    {loading ? (
+                      <><SentiBotAvatar emotion="loading" size="xs" /><span>Analyzing...</span></>
+                    ) : (
+                      "Analyze & Save"
+                    )}
                   </button>
                 )}
               </div>
@@ -168,6 +174,21 @@ export default function JournalPage() {
                    <span className="relative inline-flex rounded-full h-2 w-2 bg-sage-500"></span>
                  </span>
                </div>
+
+               {/* SentiBot emotion display */}
+               <div className="flex flex-col items-center py-4">
+                 <div 
+                   className="cursor-pointer hover:scale-105 transition-transform duration-300 group relative"
+                   title="Your SentiBot Companion"
+                 >
+                   <SentiBotAvatar
+                     emotion={result.clinical.category}
+                     size="lg"
+                     animate={true}
+                     showLabel={true}
+                   />
+                 </div>
+               </div>
                
                <div className={`medical-card p-5 border-l-4 ${catCfg.border}`}>
                   <div className="flex items-center gap-4">
@@ -187,10 +208,21 @@ export default function JournalPage() {
                  <EmotionChart emotions={result.emotions} />
                </div>
              </div>
+           ) : loading ? (
+             <div className="h-full min-h-[360px] border-2 border-dashed border-sage-200 rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-sage-50/50">
+               <SentiBotAvatar emotion="loading" size="lg" animate={true} />
+               <p className="text-sm font-semibold text-warm-600 tracking-tight mt-4">Analyzing Your Entry...</p>
+               <p className="text-xs text-warm-400 mt-2 leading-relaxed">SentiBot is reading your thoughts and preparing clinical insights.</p>
+             </div>
            ) : (
              <div className="h-full min-h-[360px] border-2 border-dashed border-sage-200 rounded-3xl flex flex-col items-center justify-center text-warm-400 p-8 text-center bg-sage-50/50">
-               <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center text-3xl opacity-50 mb-3 shadow-inner">🧭</div>
-               <p className="text-sm font-semibold text-warm-600 tracking-tight">Awaiting Entry</p>
+               <div 
+                 className="hover:scale-105 transition-transform duration-300 cursor-pointer"
+                 title="Your SentiBot Companion"
+               >
+                 <SentiBotAvatar emotion="idle" size="lg" animate={true} />
+               </div>
+               <p className="text-sm font-semibold text-warm-600 tracking-tight mt-4">Awaiting Entry</p>
                <p className="text-xs mt-2 leading-relaxed">Write your journal entry and analyze it to view your real-time psychological metrics.</p>
              </div>
            )}

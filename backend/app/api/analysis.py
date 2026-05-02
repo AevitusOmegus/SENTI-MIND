@@ -6,7 +6,7 @@ from app.models.schemas import (
     EntityResult, RiskAssessment, ModelUsed
 )
 from app.models.classifier import classifier
-from app.models.detect_emotions import detect_emotions
+from app.models.emotions import detect_emotions
 from app.models.llm import generate_insight
 from app.services.ner import extract_entities
 from app.services.risk_engine import assess_risk

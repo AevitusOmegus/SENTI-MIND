@@ -1,10 +1,10 @@
 """
 Enhanced Risk Engine (v3)
 - Graduated keyword scoring (plan > ideation > passive)
-- Negation awareness
-- Temporal awareness
-- Multi-emotion integration
-- Context-based weighting
+- Negation awareness ("I am NOT suicidal" reduces risk)
+- Temporal awareness ("I was suicidal last year" scores lower)
+- Multi-emotion integration (top-3 emotions)
+- Context-based weighting between classifier and keywords
 """
 
 import re
@@ -15,7 +15,9 @@ from app.core.preprocessing import has_negated_crisis
 HIGH_RISK_EMOTIONS = {"anger", "fear", "sadness", "disgust"}
 
 # Crisis keywords are imported from constants.py (single source of truth)
+# CRISIS_KEYWORDS contains all tiered keywords with severity weights.
 
+# Past-tense patterns that indicate recovery or historical context
 PAST_TENSE_PATTERNS = [
     r"\b(used to|i was|i had|years ago|months ago|last year|in the past)\b.{0,30}\b(suicidal|suicide|depressed|self.?harm|kill myself)\b",
     r"\b(suicidal|suicide|depressed|self.?harm)\b.{0,30}\b(years ago|months ago|last year|in the past|used to|i was|recovered|better now)\b",
@@ -25,6 +27,7 @@ _PAST_TENSE_RES = [re.compile(p, re.IGNORECASE) for p in PAST_TENSE_PATTERNS]
 
 
 def _is_past_tense_context(text: str) -> bool:
+    """Check if crisis keywords appear in past-tense / recovery context."""
     for pat in _PAST_TENSE_RES:
         if pat.search(text):
             return True
@@ -75,6 +78,7 @@ def assess_risk(text: str, emotions: list[dict], clinical: dict) -> dict:
         risk_score = suicidal_conf * 0.45 + emotion_score * 0.30 + keyword_score * 0.25
 
     risk_score = round(float(min(risk_score, 1.0)), 4)
+
     safety_protocol = suicidal_conf >= SAFETY_PROTOCOL_THRESHOLD
 
     if safety_protocol or risk_score >= RISK_THRESHOLDS["high"]:

@@ -1,121 +1,45 @@
 import logging
 import os
-import re
 from pathlib import Path
 
 import joblib
 import numpy as np
 
+from app.core.preprocessing import preprocess
+
 logger = logging.getLogger(__name__)
 
 _data_dir = Path(__file__).parent.parent.parent / "data"
-MODEL_PATH = Path(os.getenv("SENTIMIND_MODEL_PATH", _data_dir / "sentiment_model_v2.joblib"))
-VECTORIZER_PATH = Path(os.getenv("SENTIMIND_VECTORIZER_PATH", _data_dir / "vectorizer_v2.joblib"))
+MODEL_PATH = Path(os.getenv("SENTIMIND_MODEL_PATH", _data_dir / "sentiment_model.joblib"))
+VECTORIZER_PATH = Path(os.getenv("SENTIMIND_VECTORIZER_PATH", _data_dir / "vectorizer.joblib"))
 
-_UNKNOWN_RESULT = {"category": "Unknown", "confidence": 0.0, "top_categories": []}
+_UNKNOWN_RESULT = {"category": "Unknown", "confidence": 0.0, "top_categories": [], "is_ambiguous": False, "alternative_category": None, "confidence_tier": "none"}
+
+# Confidence thresholds
+CONFIDENCE_THRESHOLD = 0.35        # Below this → "Uncertain"
+AMBIGUITY_MARGIN = 0.10            # If top-2 within this margin → ambiguous
+MIN_MEANINGFUL_WORDS = 3           # Fewer → "Insufficient"
 
 
 class ClassifierNotLoadedError(RuntimeError):
     pass
 
 
-class ClinicalTextPreprocessor:
-    """
-    Advanced clinical text preprocessor with negation detection,
-    crisis indicators, and mental health term markers.
-    """
-
-    def __init__(self):
-        # Negation patterns
-        self.negation_patterns = [
-            r"\bnot\s+\w+",
-            r"\bno\s+\w+",
-            r"\bnever\s+\w+",
-            r"\bdon'?t\s+\w+",
-            r"\bdoesn'?t\s+\w+",
-            r"\bdidn'?t\s+\w+",
-            r"\bcan'?t\s+\w+",
-            r"\bcannot\s+\w+",
-            r"\bwon'?t\s+\w+",
-            r"\bwouldn'?t\s+\w+",
-            r"\bcouldn'?t\s+\w+",
-            r"\bshouldn'?t\s+\w+",
-            r"\bisn'?t\s+\w+",
-            r"\baren'?t\s+\w+",
-            r"\bwasn'?t\s+\w+",
-            r"\bweren'?t\s+\w+",
-            r"\bhaven'?t\s+\w+",
-            r"\bhasn'?t\s+\w+",
-            r"\bhadn'?t\s+\w+",
-        ]
-
-        # Crisis indicators — only genuinely high-severity phrases
-        # Low-weight fuzzy terms ('depressed', 'anxious', 'stressed') removed
-        # to prevent false-positive classification of everyday language.
-        self.crisis_indicators = {
-            'suicide': 1.0,
-            'suicidal': 1.0,
-            'kill myself': 1.0,
-            'killing myself': 1.0,
-            'end my life': 1.0,
-            'ending my life': 1.0,
-            'want to die': 1.0,
-            'wanting to die': 1.0,
-            'better off dead': 1.0,
-            'not worth living': 1.0,
-            'final exit': 1.0,
-            'ending it': 1.0,
-            'end it all': 1.0,
-            'self-harm': 0.9,
-            'self harm': 0.9,
-            'cut myself': 0.9,
-            'cutting myself': 0.9,
-            'hurt myself': 0.9,
-            'hurting myself': 0.9,
-            'harm myself': 0.9,
-            'no reason to live': 0.8,
-            'can\'t go on': 0.7,
-            'cannot go on': 0.7,
-            'tired of living': 0.7,
-        }
-
-    def preprocess(self, text: str) -> str:
-        """Apply comprehensive preprocessing."""
-        if not isinstance(text, str):
-            return ""
-
-        # Lowercase and strip
-        text = text.lower().strip()
-
-        # Handle negations
-        for pattern in self.negation_patterns:
-            text = re.sub(
-                pattern,
-                lambda m: " NEG_" + m.group(0).replace(' ', '_').replace("'", '').replace('"', '') + " ",
-                text
-            )
-
-        # Add crisis indicator markers (high-severity phrases only)
-        for indicator, weight in self.crisis_indicators.items():
-            if indicator in text:
-                text += f" CRISIS_{indicator.replace(' ', '_')}_W{int(weight*10)} "
-
-        # Normalize whitespace
-        text = re.sub(r'\s+', ' ', text).strip()
-
-        return text
-
-
 class ClinicalClassifier:
     """
-    Clinical classifier for mental health text classification.
+    Clinical classifier for mental health text classification (v3).
     Uses a calibrated LinearSVC model with TF-IDF features.
+
+    Improvements over v2:
+    - Shared preprocessor from app.core.preprocessing
+    - Confidence thresholding (returns 'Uncertain' for low confidence)
+    - Ambiguity detection (flags when top-2 predictions are close)
+    - Minimum content filter (returns 'Insufficient' for very short text)
     """
 
     def __init__(self) -> None:
         self._model = None
         self._vectorizer = None
-        self._preprocessor = ClinicalTextPreprocessor()
         self._classes = None
 
     def load(self) -> None:
@@ -137,7 +61,7 @@ class ClinicalClassifier:
             raise RuntimeError(f"Unexpected vectorizer type: {type(self._vectorizer)}")
 
         self._classes = self._model.classes_
-        logger.info("ClinicalClassifier v2 loaded. Classes: %s", list(self._classes))
+        logger.info("ClinicalClassifier v3 loaded. Classes: %s", list(self._classes))
 
     def unload(self) -> None:
         """Unload model and free memory."""
@@ -154,11 +78,9 @@ class ClinicalClassifier:
         """
         Predict clinical category for text.
 
-        Args:
-            text: Input text to classify
-
-        Returns:
-            Dictionary with category, confidence, and top_categories
+        Returns dict with:
+            category, confidence, top_categories,
+            is_ambiguous, alternative_category, confidence_tier
         """
         if not self.is_loaded:
             raise ClassifierNotLoadedError("Call load() before predict().")
@@ -166,21 +88,34 @@ class ClinicalClassifier:
         if not isinstance(text, str) or not text.strip():
             return dict(_UNKNOWN_RESULT)
 
-        # Check for meaningful content
-        cleaned = re.sub(r'[^\w\s]', '', text.lower())
-        words = [w for w in cleaned.split() if len(w) > 1]
+        # Preprocess using the shared pipeline (same as training)
+        processed = preprocess(text)
+
+        # Check minimum content after preprocessing
+        words = [w for w in processed.split() if len(w) > 1 and not w.startswith(("NEG_", "INTENSE_", "DIM_", "PAST_", "CRISIS_"))]
         if len(words) < 1:
             return dict(_UNKNOWN_RESULT)
 
-        # Preprocess text
-        processed = self._preprocessor.preprocess(text)
+        if len(words) < MIN_MEANINGFUL_WORDS:
+            return {
+                "category": "Insufficient",
+                "confidence": 0.0,
+                "top_categories": [],
+                "is_ambiguous": False,
+                "alternative_category": None,
+                "confidence_tier": "none",
+            }
 
-        # Transform and predict
         vec = self._vectorizer.transform([processed])
         probs = self._model.predict_proba(vec)[0]
-        best_idx = int(np.argmax(probs))
 
-        # Build top categories list
+        sorted_indices = np.argsort(probs)[::-1]
+        best_idx = sorted_indices[0]
+        second_idx = sorted_indices[1]
+
+        best_conf = float(probs[best_idx])
+        second_conf = float(probs[second_idx])
+
         top_categories = sorted(
             [
                 {"category": str(cls), "confidence": round(float(p), 4)}
@@ -190,10 +125,23 @@ class ClinicalClassifier:
             reverse=True,
         )
 
+        if best_conf >= 0.70:
+            confidence_tier = "high"
+        elif best_conf >= CONFIDENCE_THRESHOLD:
+            confidence_tier = "medium"
+        else:
+            confidence_tier = "low"
+
+        is_ambiguous = (best_conf - second_conf) < AMBIGUITY_MARGIN
+        alternative_category = str(self._classes[second_idx]) if is_ambiguous else None
+
         return {
             "category": str(self._classes[best_idx]),
-            "confidence": round(float(probs[best_idx]), 4),
+            "confidence": round(best_conf, 4),
             "top_categories": top_categories,
+            "is_ambiguous": is_ambiguous,
+            "alternative_category": alternative_category,
+            "confidence_tier": confidence_tier,
         }
 
 

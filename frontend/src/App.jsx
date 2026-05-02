@@ -34,6 +34,7 @@ export default function App() {
         <Route path="chat" element={<ChatPage />} />
       </Route>
 
+      {/* Default redirect */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

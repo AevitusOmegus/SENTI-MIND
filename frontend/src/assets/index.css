@@ -528,3 +528,365 @@ body {
     overscroll-behavior-y: none;
   }
 }
+
+/* =============================================================================
+   SENTIBOT AVATAR — Animated Therapist Companion
+   ============================================================================= */
+
+/* Container */
+.sentibot-container {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sentibot-container:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 20px;
+}
+
+.sentibot-svg {
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(61, 82, 61, 0.15));
+  transition: filter 0.3s ease;
+  overflow: visible;
+}
+
+.sentibot-container:hover .sentibot-svg {
+  filter: drop-shadow(0 6px 16px rgba(61, 82, 61, 0.25));
+}
+
+.sentibot-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.4s ease;
+}
+
+/* ─── Lively Idle (breathing + head tilt) ─── */
+@keyframes sentibot-idle-anim {
+  0%, 100% { transform: scale(1) translateY(0) rotate(0deg); }
+  25% { transform: scale(1.01) translateY(-2px) rotate(1deg); }
+  50% { transform: scale(1.02) translateY(-3px) rotate(0deg); }
+  75% { transform: scale(1.01) translateY(-2px) rotate(-1deg); }
+}
+.sentibot-breathe {
+  animation: sentibot-idle-anim 6s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* ─── Thinking / Loading ─── */
+@keyframes sentibot-think-anim {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.02) rotate(2deg); }
+  75% { transform: scale(0.98) rotate(-2deg); }
+}
+.sentibot-thinking {
+  animation: sentibot-think-anim 2s ease-in-out infinite;
+}
+
+/* ─── Ambient Halo Pulse ─── */
+@keyframes sentibot-halo-pulse-anim {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}
+.sentibot-halo-pulse {
+  animation: sentibot-halo-pulse-anim 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ─── Visor Scan Line (Loading) ─── */
+@keyframes sentibot-scan-line-anim {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(48px); opacity: 0; }
+}
+.sentibot-scan-line {
+  animation: sentibot-scan-line-anim 2s linear infinite;
+}
+
+/* ─── Fast pulse (stress) ─── */
+@keyframes sentibot-pulse-fast-anim {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.sentibot-pulse-fast {
+  animation: sentibot-pulse-fast-anim 1.2s ease-in-out infinite;
+}
+
+/* ─── Tremble (anxiety) ─── */
+@keyframes sentibot-tremble-anim {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-1px) rotate(-1deg); }
+  20% { transform: translateX(1px) rotate(1deg); }
+  30% { transform: translateX(-0.5px); }
+  40% { transform: translateX(0.5px); }
+  50% { transform: translateX(0); }
+}
+.sentibot-tremble {
+  animation: sentibot-tremble-anim 1.5s ease-in-out infinite;
+}
+
+/* ─── Heavy breathing (depression) ─── */
+@keyframes sentibot-heavy-anim {
+  0%, 100% { transform: scale(1) translateY(0); opacity: 1; }
+  50% { transform: scale(0.96) translateY(3px); opacity: 0.9; }
+}
+.sentibot-heavy {
+  animation: sentibot-heavy-anim 6s ease-in-out infinite;
+}
+
+/* ─── Color cycling (bipolar) ─── */
+@keyframes sentibot-cycle-anim {
+  0%, 100% { transform: scale(1); filter: hue-rotate(0deg); }
+  25% { transform: scale(1.03); filter: hue-rotate(20deg); }
+  50% { transform: scale(0.97); filter: hue-rotate(-15deg); }
+  75% { transform: scale(1.01); filter: hue-rotate(10deg); }
+}
+.sentibot-cycle {
+  animation: sentibot-cycle-anim 4s ease-in-out infinite;
+}
+
+/* ─── Alert pulse (suicidal) ─── */
+@keyframes sentibot-alert-anim {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.sentibot-alert {
+  animation: sentibot-alert-anim 2s ease-in-out infinite;
+}
+
+@keyframes sentibot-alert-ring-anim {
+  0%, 100% { opacity: 0.6; stroke-width: 3; }
+  50% { opacity: 0.1; stroke-width: 6; }
+}
+.sentibot-alert-ring {
+  animation: sentibot-alert-ring-anim 1.5s ease-in-out infinite;
+}
+
+/* ─── Split effect (personality disorder) ─── */
+@keyframes sentibot-split-anim {
+  0%, 100% { transform: scaleX(1); }
+  25% { transform: scaleX(1.02) skewX(1deg); }
+  75% { transform: scaleX(0.98) skewX(-1deg); }
+}
+.sentibot-split {
+  animation: sentibot-split-anim 3.5s ease-in-out infinite;
+}
+
+/* ─── Natural Eye blink (lively idle) ─── */
+@keyframes sentibot-blink-natural-anim {
+  0%, 9%, 11%, 49%, 51%, 100% { transform: scaleY(1); }
+  10%, 50% { transform: scaleY(0.1); }
+}
+.sentibot-blink-natural {
+  animation: sentibot-blink-natural-anim 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ─── Eye blink (loading) ─── */
+@keyframes sentibot-blink-anim {
+  0%, 42%, 44%, 100% { transform: scaleY(1); }
+  43% { transform: scaleY(0.1); }
+}
+.sentibot-blink {
+  animation: sentibot-blink-anim 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ─── Look around pupils (lively idle) ─── */
+@keyframes sentibot-look-around-anim {
+  0%, 100% { transform: translateX(0); }
+  15%, 25% { transform: translateX(-3px); }
+  45%, 55% { transform: translateX(3px); }
+  70%, 80% { transform: translateX(0) translateY(-2px); }
+}
+.sentibot-look-around {
+  animation: sentibot-look-around-anim 8s ease-in-out infinite;
+}
+
+/* ─── Tear drop (sad/suicidal) ─── */
+@keyframes sentibot-tear-anim {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(12px); }
+}
+.sentibot-tear {
+  animation: sentibot-tear-anim 2.5s ease-in infinite;
+}
+
+/* ─── Pupil shift (bipolar shifting eyes) ─── */
+@keyframes sentibot-pupil-shift-anim {
+  0%, 100% { transform: translateX(0); }
+  30% { transform: translateX(3px); }
+  60% { transform: translateX(-3px); }
+}
+.sentibot-pupil-shift {
+  animation: sentibot-pupil-shift-anim 3s ease-in-out infinite;
+}
+
+/* ─── Mouth shift (bipolar mixed) ─── */
+@keyframes sentibot-mouth-shift-anim {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(-1) translateY(-6px); }
+}
+.sentibot-mouth-shift {
+  animation: sentibot-mouth-shift-anim 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* ─── Wavy mouth (anxiety) ─── */
+@keyframes sentibot-wavy-anim {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(2px); }
+}
+.sentibot-wavy-mouth {
+  animation: sentibot-wavy-anim 0.8s ease-in-out infinite;
+}
+
+
+/* =============================================================================
+   SENTIBOT FAB — Floating Action Button & Speech Bubble
+   ============================================================================= */
+
+.sentibot-fab {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .sentibot-fab {
+    bottom: 28px;
+    right: 28px;
+  }
+}
+
+.sentibot-fab-inner {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--color-sage-200);
+  box-shadow: 0 4px 20px rgba(61, 82, 61, 0.15), 0 2px 8px rgba(61, 82, 61, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 2;
+}
+
+.sentibot-fab-inner:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(61, 82, 61, 0.2), 0 4px 12px rgba(61, 82, 61, 0.15);
+  border-color: var(--color-sage-300);
+}
+
+.sentibot-fab-inner:active {
+  transform: scale(0.95);
+}
+
+/* Background pulse behind FAB */
+@keyframes sentibot-fab-pulse-anim {
+  0% { transform: scale(1); opacity: 0.3; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.sentibot-fab-pulse {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--color-sage-400);
+  z-index: 1;
+  animation: sentibot-fab-pulse-anim 2.5s ease-out infinite;
+}
+
+/* ─── Speech Bubble ─── */
+.sentibot-speech-bubble {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(168, 213, 186, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-warm-700);
+  max-width: 200px;
+  position: relative;
+  transform-origin: right center;
+  animation: sentibot-bubble-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.sentibot-speech-bubble::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(255, 255, 255, 0.95);
+}
+
+.sentibot-speech-bubble:hover {
+  background: white;
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes sentibot-bubble-pop {
+  0% { opacity: 0; transform: scale(0.8) translateX(10px); }
+  100% { opacity: 1; transform: scale(1) translateX(0); }
+}
+
+
+/* ─── Touch Squish Effect ─── */
+.sentibot-touched {
+  transform: scale(0.9) translateY(4%);
+  transform-origin: center bottom;
+}
+
+
+/* ─── Therapist Aesthetics ─── */
+@keyframes sentibot-empathy-breathe-anim {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.sentibot-empathy-breathe {
+  animation: sentibot-empathy-breathe-anim 6s ease-in-out infinite; /* 4-7-8 rhythm proxy */
+  transform-origin: center;
+}
+
+@keyframes sentibot-waveform-anim {
+  0%, 100% { transform: scaleY(1); opacity: 0.3; }
+  25% { transform: scaleY(1.4); opacity: 0.6; }
+  75% { transform: scaleY(0.7); opacity: 0.2; }
+}
+.sentibot-waveform rect {
+  transform-origin: center bottom;
+}
+.sentibot-waveform rect:nth-child(1) { animation: sentibot-waveform-anim 1.5s ease-in-out infinite 0.1s; }
+.sentibot-waveform rect:nth-child(2) { animation: sentibot-waveform-anim 1.5s ease-in-out infinite 0.4s; }
+.sentibot-waveform rect:nth-child(3) { animation: sentibot-waveform-anim 1.5s ease-in-out infinite 0.2s; }
+.sentibot-waveform rect:nth-child(4) { animation: sentibot-waveform-anim 1.5s ease-in-out infinite 0.5s; }
+

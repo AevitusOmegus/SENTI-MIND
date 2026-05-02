@@ -50,6 +50,7 @@ async def submit_screener(
             })
             .execute()
         )
+
         return {
             **result.data[0],
             "gad2_interpretation": _interpret_gad2(gad2),
