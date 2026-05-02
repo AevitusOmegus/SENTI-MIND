@@ -32,9 +32,6 @@ if VERCEL_ORIGIN not in allowed_origins:
     allowed_origins.append(VERCEL_ORIGIN)
 
 
-# --- Failsafe CORS middleware (runs BEFORE FastAPI error handlers) ---
-# Guarantees Access-Control-Allow-Origin is present even on 500 crashes,
-# so the browser reports the real error instead of a misleading CORS block.
 class ForceCORSMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         origin = request.headers.get("origin", "")
@@ -42,8 +39,8 @@ class ForceCORSMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         except Exception as exc:
             response = JSONResponse({"detail": str(exc)}, status_code=500)
-        if origin in allowed_origins or not origin:
-            response.headers["Access-Control-Allow-Origin"] = origin or "*"
+        if origin and origin in allowed_origins:
+            response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
             response.headers["Access-Control-Allow-Methods"] = "*"
             response.headers["Access-Control-Allow-Headers"] = "*"

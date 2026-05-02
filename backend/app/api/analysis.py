@@ -1,21 +1,28 @@
-from fastapi import APIRouter, HTTPException
+import logging
+from fastapi import APIRouter, Depends, HTTPException
 from app.models.schemas import (
     AnalysisRequest, AnalysisResponse,
     EmotionResult, ClinicalResult, ClinicalCategory,
     EntityResult, RiskAssessment, ModelUsed
 )
 from app.models.classifier import classifier
-from app.models.emotions import detect_emotions
+from app.models.detect_emotions import detect_emotions
 from app.models.llm import generate_insight
 from app.services.ner import extract_entities
 from app.services.risk_engine import assess_risk
 from app.services.preprocessor import clean_text
+from app.api.auth_middleware import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
 @router.post("/", response_model=AnalysisResponse)
-async def analyze_text(payload: AnalysisRequest):
+async def analyze_text(
+    payload: AnalysisRequest,
+    user_id: str = Depends(get_current_user),
+):
     raw_text = payload.text.strip()
     if not raw_text:
         raise HTTPException(status_code=422, detail="Text cannot be empty.")
@@ -34,6 +41,9 @@ async def analyze_text(payload: AnalysisRequest):
                 ClinicalCategory(category=c["category"], confidence=c["confidence"])
                 for c in raw_clinical.get("top_categories", [])
             ],
+            is_ambiguous=raw_clinical.get("is_ambiguous", False),
+            alternative_category=raw_clinical.get("alternative_category"),
+            confidence_tier=raw_clinical.get("confidence_tier", "medium"),
         )
 
         raw_entities = extract_entities(cleaned_text)
@@ -60,7 +70,7 @@ async def analyze_text(payload: AnalysisRequest):
                 details={"api_endpoint": "router.huggingface.co"}
             ),
             ModelUsed(
-                name="ClinicalClassifier (LinearSVC TF-IDF)",
+                name="ClinicalClassifier v3 (LinearSVC TF-IDF)",
                 type="clinical",
                 provider="local",
             )
@@ -89,4 +99,5 @@ async def analyze_text(payload: AnalysisRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.exception("Analysis failed for user %s: %s", user_id, e)
+        raise HTTPException(status_code=500, detail="Analysis failed. Please try again.")
