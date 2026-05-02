@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
 class AnalysisRequest(BaseModel):
-    text: str
+    text: str = Field(..., min_length=1, max_length=5000)
 
 
 class EmotionResult(BaseModel):
@@ -20,6 +20,9 @@ class ClinicalResult(BaseModel):
     category: str
     confidence: float
     top_categories: list[ClinicalCategory]
+    is_ambiguous: bool = False
+    alternative_category: Optional[str] = None
+    confidence_tier: str = "medium"
 
 
 class EntityResult(BaseModel):

@@ -30,3 +30,6 @@ frontend/.cache/
 .pytest_cache/
 htmlcov/
 .coverage
+
+# Generated
+graphify-out/
