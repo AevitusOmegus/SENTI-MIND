@@ -9,6 +9,7 @@ import HistoryPage from "./pages/HistoryPage";
 import GratitudeJarPage from "./pages/GratitudeJarPage";
 import ScreenerPage from "./pages/ScreenerPage";
 import WellnessToolsPage from "./pages/WellnessToolsPage";
+import ChatPage from "./pages/ChatPage";
 
 export default function App() {
   return (
@@ -30,9 +31,9 @@ export default function App() {
         <Route path="gratitude" element={<GratitudeJarPage />} />
         <Route path="screener" element={<ScreenerPage />} />
         <Route path="wellness" element={<WellnessToolsPage />} />
+        <Route path="chat" element={<ChatPage />} />
       </Route>
 
-      {/* Default redirect */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
