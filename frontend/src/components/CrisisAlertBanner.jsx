@@ -2,20 +2,20 @@ import { Phone, MessageCircle, ExternalLink, Heart } from "lucide-react";
 
 const CRISIS_RESOURCES = [
   {
-    name: "988 Suicide & Crisis Lifeline",
-    phone: "988",
-    description: "Call or text for immediate 24/7 support",
+    name: "Umang Mental Health Helpline",
+    phone: "042 3576 5951",
+    description: "Call for immediate 24/7 mental health support",
     icon: Phone,
     color: "bg-medical-emergency",
     action: "Call Now",
   },
   {
-    name: "Crisis Text Line",
-    phone: "741741",
-    description: "Text HOME to connect with a counselor",
-    icon: MessageCircle,
+    name: "Emergency Ambulance (Rescue 1122)",
+    phone: "1122",
+    description: "Call for immediate medical emergencies",
+    icon: Phone,
     color: "bg-sage-600",
-    action: "Text HOME",
+    action: "Call 1122",
   },
 ];
 
@@ -88,7 +88,7 @@ export default function CrisisAlertBanner({
             You are not alone. Help is available 24/7, completely free and confidential.
           </p>
           <a
-            href="https://www.988lifeline.org"
+            href="https://umang.com.pk"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-white font-medium flex items-center gap-1.5 hover:underline whitespace-nowrap px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
@@ -102,7 +102,7 @@ export default function CrisisAlertBanner({
       {/* Medical Disclaimer */}
       <div className="mt-3 p-3 bg-rose-50 rounded-xl border border-rose-200">
         <p className="text-xs text-rose-700 text-center">
-          ⚠️ If you're in immediate danger, please call <strong className="font-semibold">911</strong> or go to your nearest emergency room.
+          ⚠️ If you're in immediate danger, please call <strong className="font-semibold">1122</strong> or go to your nearest emergency room.
         </p>
       </div>
     </div>

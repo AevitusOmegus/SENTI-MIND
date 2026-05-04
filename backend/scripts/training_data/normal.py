@@ -1,5 +1,5 @@
 NORMAL = [
-    # --- 1-100: DAILY LIFE & MUNDANE TASKS ---
+    # Daily life and mundane tasks
     "I had a really productive day at work today",
     "I'm feeling great and looking forward to the weekend",
     "Just got back from a morning run and I feel amazing",
@@ -101,7 +101,7 @@ NORMAL = [
     "Just updated my resume and I'm feeling ready for new opportunities",
     "I had a very refreshing nap this afternoon",
 
-    # --- 101-200: HARD NEGATIVES (CLINICAL WORDS / HEALTHY CONTEXT) ---
+    # Hard negatives (clinical words in healthy contexts)
     "My friend's mood was a bit off but she's fine now",
     "My friend's stress about exams is pretty normal for this time of year",
     "My brother's stress about his new job will ease once he settles in",
@@ -191,7 +191,7 @@ NORMAL = [
     "I'm summarizing a research paper on the efficacy of CBT for my psych class",
     "We are analyzing the historical evolution of the DSM in our seminar today",
 
-    # --- 201-300: SOCIAL, CAREER & WELLNESS ---
+    # Social, career and wellness
     "The local farmer's market had the best strawberries today",
     "I'm organizing my bookshelves by color just for fun",
     "I finally fixed the squeaky hinge on the bathroom door",
@@ -290,7 +290,7 @@ NORMAL = [
     "I'm feeling very happy with my new apartment",
     "I had a very peaceful evening listening to jazz music",
 
-    # --- 301-400: PRODUCTIVITY & COMMUNITY ---
+    # Productivity and community
     "I'm looking forward to the weekend market",
     "I'm feeling very motivated to reach my fitness goals",
     "I finally started that blog I've been thinking about",
@@ -392,7 +392,7 @@ NORMAL = [
     "I'm feeling very motivated to achieve my dreams",
     "I had a very fun day at the beach with my family",
 
-    # --- 401-500: CONSISTENCY & LONG-TERM STABILITY ---
+    # Consistency and long-term stability
     "I'm looking forward to the beautiful sunsets of summer",
     "I'm feeling very grateful for the health and happiness i have",
     "I finally finished that book I was reading and it was great",

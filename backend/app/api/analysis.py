@@ -28,11 +28,14 @@ async def analyze_text(
         raise HTTPException(status_code=422, detail="Text cannot be empty.")
 
     try:
+        # Clean and preprocess text
         cleaned_text, emoji_tokens = clean_text(raw_text)
 
+        # Detect emotions
         raw_emotions = await detect_emotions(cleaned_text)
         emotions = [EmotionResult(label=e["label"], score=e["score"]) for e in raw_emotions]
 
+        # Predict clinical category
         raw_clinical = classifier.predict(cleaned_text)
         clinical = ClinicalResult(
             category=raw_clinical["category"],
@@ -46,12 +49,14 @@ async def analyze_text(
             confidence_tier=raw_clinical.get("confidence_tier", "medium"),
         )
 
+        # Extract named entities
         raw_entities = extract_entities(cleaned_text)
         entities = [
             EntityResult(text=e["text"], label=e["label"], start=e["start"], end=e["end"])
             for e in raw_entities
         ]
 
+        # Assess risk level based on clinical and emotion data
         raw_risk = assess_risk(cleaned_text, raw_emotions, raw_clinical)
         risk = RiskAssessment(
             level=raw_risk["level"],
@@ -60,8 +65,10 @@ async def analyze_text(
             safety_protocol=raw_risk["safety_protocol"],
         )
 
+        # Generate insights using LLM
         insight, llm_details = await generate_insight(cleaned_text, raw_emotions, raw_clinical, raw_risk)
 
+        # Track model usage metadata
         models_used = [
             ModelUsed(
                 name="j-hartmann/emotion-english-distilroberta-base",
@@ -85,6 +92,7 @@ async def analyze_text(
                 )
             )
 
+        # Construct and return final response
         return AnalysisResponse(
             raw_text=raw_text,
             preprocessed_text=cleaned_text,

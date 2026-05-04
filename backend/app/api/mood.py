@@ -1,6 +1,4 @@
-"""
-Mood API — save mood logs and return heatmap data.
-"""
+
 import logging
 from datetime import date, timedelta
 from typing import Optional
@@ -53,7 +51,6 @@ async def get_heatmap(
     user_id: str = Depends(get_current_user),
     sb: Client = Depends(get_authenticated_client),
 ):
-    """Return the last 30 days of mood logs (one entry per day — latest wins)."""
     try:
         since = (date.today() - timedelta(days=29)).isoformat()
         result = (
@@ -86,7 +83,6 @@ async def get_trends(
     user_id: str = Depends(get_current_user),
     sb: Client = Depends(get_authenticated_client),
 ):
-    """Return mood trend data for line charts."""
     try:
         since = (date.today() - timedelta(days=days - 1)).isoformat()
         result = (

@@ -1,5 +1,5 @@
 SUICIDAL = [
-    # --- 1-100: Direct Intent & Final Goodbyes ---
+    # Direct Intent & Final Goodbyes
     "I want to end my life I can't take this anymore",
     "I've been thinking about suicide every day",
     "I have a plan to kill myself",
@@ -98,7 +98,7 @@ SUICIDAL = [
     "The urge to step into traffic is getting too strong to ignore",
     "I wish i got into a fatal car crash today on the way home",
 
-    # --- 101-200: Internet Slang & Specific Scenarios ---
+    # Internet Slang & Specific Scenarios
     "honestly im ready to logout for good",
     "i want to alt f4 my life right now",
     "it's time for me to go dark permanently",
@@ -199,7 +199,7 @@ SUICIDAL = [
     "i've been looking at the bridge every day on my way to work",
     "i want to be gone from here",
 
-    # --- 201-300: Feelings of Worthlessness & Despair ---
+    # Feelings of Worthlessness & Despair
     "i'm just a waste of air and i should stop breathing",
     "my heart is heavy and i want it to stop beating",
     "i'm a ghost in my own home and i want to be gone",
@@ -301,7 +301,7 @@ SUICIDAL = [
     "i want to be a part of the wind",
     "i'm a shadow that's disappearing into the light",
 
-    # --- 301-400: Planning, Methods & Specific Crisis ---
+    # Planning, Methods & Specific Crisis
     "i'm going to take the pills in the orange bottle tonight",
     "i've been looking at the rafters in the barn",
     "i'm going to use the hunting rifle in the cabinet",
@@ -403,7 +403,7 @@ SUICIDAL = [
     "i'm going to jump from the ledge of the building",
     "i've been researching the lethal dose of my prescription",
 
-    # --- 401-500: Hopelessness, Pain & Final Resolve ---
+    # Hopelessness, Pain & Final Resolve
     "the pain is like a physical weight i can't carry",
     "i've reached the end of my rope literally and figuratively",
     "there is no light at the end of the tunnel only a wall",

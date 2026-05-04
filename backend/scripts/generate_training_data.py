@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""
-SENTI-MIND Training Data Generator (v4)
-Imports from modular training_data/ package.
-150+ unique sentences per class, balanced at 200 samples each.
-"""
+
 
 import csv
 import random

@@ -1,5 +1,5 @@
 DEPRESSION = [
-    # --- 1-100: CORE SENTIMENT & EMOTIONAL SYMPTOMS ---
+    # Core Sentiment & Emotional Symptoms
     "I feel empty inside and nothing brings me joy anymore",
     "Getting out of bed every morning feels impossible",
     "I've stopped caring about things I used to love",
@@ -98,7 +98,7 @@ DEPRESSION = [
     "i have no will to fight anymore everything is too much",
     "i feel consumed by a darkness i cant explain",
 
-    # --- 101-200: MODERN SLANG & INFORMAL EXPRESSIONS (BED-ROT, ETC) ---
+    # Modern Slang & Informal Expressions (Bed-Rot, etc)
     "bro i literally cant even get out of bed today",
     "everything is just so gray and pointless rn",
     "my bed rot has been going on for like three days straight",
@@ -200,7 +200,7 @@ DEPRESSION = [
     "nothing makes sense and i’m too tired to care",
     "i’m just done. with everything.",
 
-    # --- 201-300: RELATIONAL & COGNITIVE IMPACT ---
+    # Relational & Cognitive Impact
     "I feel like my friends only tolerate me out of pity",
     "I can't follow a movie plot anymore because my brain is so slow",
     "I've started lying to people about how busy I am so I can stay home",
@@ -302,7 +302,7 @@ DEPRESSION = [
     "I’m so tired of the life I’m living",
     "I feel like I’m at my breaking point",
 
-    # --- 301-400: PHYSICALITY, APATHY & FATIGUE ---
+    # Physicality, Apathy & Fatigue
     "My legs feel like lead when I try to walk",
     "I could sleep for 12 hours and still feel like I haven't closed my eyes",
     "My apartment is a mess and I just don't care enough to clean it",
@@ -404,7 +404,7 @@ DEPRESSION = [
     "I’m so tired of the darkness",
     "I feel like i’m at a dead end",
 
-    # --- 401-500: EXISTENTIAL DREAD & RECOVERY STRUGGLES ---
+    # Existential Dread & Recovery Struggles
     "I’m trying to get better but it feels like the depression is fighting back",
     "I feel like I’m faking being depressed but also faking being okay",
     "I hate that I have to work so hard just to feel 'nothing' instead of 'pain'",

@@ -1,22 +1,9 @@
-"""
-SENTI-MIND Clinical Text Preprocessor (v3)
-Single source of truth — used by both training and inference.
-
-Features
---------
-- Contraction expansion
-- Extended negation scope (3-word window)
-- Intensity markers (amplifiers / diminishers)
-- Temporal markers (past-tense recovery detection)
-- Crisis indicator injection (high-severity only)
-- Whitespace normalisation
-"""
 
 import re
 
 from app.core.constants import CRISIS_KEYWORDS
 
-# ── Contraction expansion ──────────────────────────────────────────────
+# Contraction expansion
 CONTRACTIONS = {
     "i'm": "i am", "i've": "i have", "i'll": "i will", "i'd": "i would",
     "you're": "you are", "you've": "you have", "you'll": "you will",
@@ -44,7 +31,7 @@ _CONTRACTION_RE = re.compile(
     re.IGNORECASE,
 )
 
-# ── Negation handling ──────────────────────────────────────────────────
+# Negation handling
 NEGATION_TRIGGERS = {
     "not", "no", "never", "neither", "nor", "nowhere", "nothing",
     "nobody", "none", "hardly", "scarcely", "barely",
@@ -53,7 +40,7 @@ NEGATION_TRIGGERS = {
 _NEG_SCOPE_END = re.compile(r"[.!?,;:\-—]")
 NEG_WINDOW = 3  # words after the trigger to negate
 
-# ── Intensity markers ─────────────────────────────────────────────────
+# Intensity markers
 AMPLIFIERS = {
     "extremely", "incredibly", "absolutely", "completely", "totally",
     "utterly", "deeply", "severely", "profoundly", "intensely",
@@ -66,7 +53,7 @@ DIMINISHERS = {
     "sort of", "kind of", "a tad",
 }
 
-# ── Temporal markers ──────────────────────────────────────────────────
+# Temporal markers
 PAST_RECOVERY_PATTERNS = [
     r"\bi used to\b",
     r"\bi was\b",
@@ -91,23 +78,16 @@ _PAST_RECOVERY_RES = [re.compile(p, re.IGNORECASE) for p in PAST_RECOVERY_PATTER
 CRISIS_INDICATORS = {k: v for k, v in CRISIS_KEYWORDS.items() if v >= 0.7}
 
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Public API
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
 def expand_contractions(text: str) -> str:
-    """Expand English contractions to their full form."""
     return _CONTRACTION_RE.sub(
         lambda m: CONTRACTIONS.get(m.group(0).lower(), m.group(0)), text
     )
 
 
 def apply_negation_scope(text: str) -> str:
-    """
-    Mark words within a negation window with NEG_ prefix.
-    E.g. "I am not feeling sad" → "I am not NEG_feeling NEG_sad"
-    """
     words = text.split()
     result = []
     neg_remaining = 0
@@ -135,7 +115,6 @@ def apply_negation_scope(text: str) -> str:
 
 
 def add_intensity_markers(text: str) -> str:
-    """Inject INTENSE_ / DIM_ markers for amplifiers and diminishers."""
     text_lower = text.lower()
     for amp in AMPLIFIERS:
         if amp in text_lower:
@@ -149,7 +128,6 @@ def add_intensity_markers(text: str) -> str:
 
 
 def add_temporal_markers(text: str) -> str:
-    """Inject PAST_RECOVERY marker if the text references past/recovered states."""
     for pat in _PAST_RECOVERY_RES:
         if pat.search(text):
             text += " PAST_RECOVERY "
@@ -158,7 +136,6 @@ def add_temporal_markers(text: str) -> str:
 
 
 def add_crisis_markers(text: str) -> str:
-    """Inject CRISIS_ markers for high-severity phrases."""
     text_lower = text.lower()
     for indicator, weight in CRISIS_INDICATORS.items():
         if indicator in text_lower:
@@ -168,10 +145,6 @@ def add_crisis_markers(text: str) -> str:
 
 
 def has_negated_crisis(text: str) -> bool:
-    """
-    Check whether crisis terms appear in a negated context.
-    E.g. "I am not suicidal" → True
-    """
     text_lower = text.lower()
     # Quick patterns for negated crisis language
     negated_patterns = [
@@ -185,18 +158,6 @@ def has_negated_crisis(text: str) -> bool:
 
 
 def preprocess(text: str) -> str:
-    """
-    Full preprocessing pipeline.
-
-    Steps:
-    1. Lowercase + strip
-    2. Expand contractions
-    3. Apply negation scope
-    4. Add intensity markers
-    5. Add temporal markers
-    6. Add crisis markers
-    7. Normalise whitespace
-    """
     if not isinstance(text, str):
         return ""
 

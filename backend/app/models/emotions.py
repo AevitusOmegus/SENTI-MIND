@@ -1,7 +1,3 @@
-"""
-Emotion Detection using HuggingFace Inference API.
-Uses j-hartmann/emotion-english-distilroberta-base (better accuracy than distilbert-base-uncased-emotion).
-"""
 
 import logging
 
@@ -11,9 +7,7 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Better emotion model: j-hartmann/emotion-english-distilroberta-base
-# This model is specifically trained for emotion classification with 6 classes:
-# anger, disgust, fear, joy, neutral, sadness, surprise
+# Emotion model specifically trained for 6 classes: anger, disgust, fear, joy, neutral, sadness, surprise
 HF_EMOTION_MODEL = "j-hartmann/emotion-english-distilroberta-base"
 
 HF_API_URL = f"https://router.huggingface.co/hf-inference/models/{HF_EMOTION_MODEL}"
@@ -21,20 +15,10 @@ HF_TIMEOUT = 15.0
 
 _FALLBACK = ({"label": "neutral", "score": 1.0},)
 
-# Model outputs 7 emotions: anger, disgust, fear, joy, neutral, sadness, surprise
-# We keep all model outputs (no synthetic emotions)
+# Keep all 7 model outputs (anger, disgust, fear, joy, neutral, sadness, surprise) without synthetic emotions
 
 
 async def detect_emotions(text: str) -> list[dict]:
-    """
-    Detect emotions using HuggingFace API.
-
-    Args:
-        text: Input text to analyze
-
-    Returns:
-        List of emotion dicts with label and score (sorted by score desc)
-    """
     if not isinstance(text, str) or not text.strip():
         return list(_FALLBACK)
 

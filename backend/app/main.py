@@ -32,7 +32,7 @@ if VERCEL_ORIGIN not in allowed_origins:
     allowed_origins.append(VERCEL_ORIGIN)
 
 
-# --- Failsafe CORS middleware (runs BEFORE FastAPI error handlers) ---
+# Failsafe CORS middleware (runs BEFORE FastAPI error handlers)
 # Guarantees Access-Control-Allow-Origin is present even on 500 crashes,
 # so the browser reports the real error instead of a misleading CORS block.
 class ForceCORSMiddleware(BaseHTTPMiddleware):

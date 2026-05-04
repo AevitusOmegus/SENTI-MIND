@@ -1,5 +1,5 @@
 STRESS = [
-    # --- Category: Workplace Overload & Burnout ---
+    # Workplace Overload & Burnout
     "my boss expects me to be on call 24/7 and I'm losing my mind",
     "I have three different managers giving me conflicting deadlines today",
     "the quarterly reports are due and I haven't slept more than four hours",
@@ -21,7 +21,7 @@ STRESS = [
     "the office politics are adding a whole new level of stress to my day",
     "I have 40 hours of work to do in a 20 hour window",
     
-    # --- Category: Physical & Somatic Symptoms of Stress ---
+    # Physical & Somatic Symptoms of Stress
     "my neck is so stiff from sitting at this desk I can barely turn my head",
     "I've been getting these stress rashes on my arms whenever I'm at work",
     "I'm grinding my teeth so hard at night my jaw is clicking",
@@ -38,7 +38,7 @@ STRESS = [
     "I’m losing hair in clumps because of the amount of pressure I’m under",
     "I feel physically heavy like I'm walking through mud every day",
     
-    # --- Category: Academic & Student Pressure ---
+    # Academic & Student Pressure
     "finals week is destroying me I have four exams in two days",
     "I'm $50,000 in debt and I don't even know if I'll get a job",
     "the pressure to get a 4.0 GPA is making me miserable",
@@ -50,7 +50,7 @@ STRESS = [
     "I have to balance a full-time internship with a full-time course load",
     "I'm so stressed about this thesis defense I've been vomiting",
     
-    # --- Category: Financial & Domestic Stress ---
+    # Financial & Domestic Stress
     "I'm checking my bank account every hour to see if my check cleared",
     "the cost of groceries is making me panic about my monthly budget",
     "I don't know how I'm going to afford the car repairs and rent this month",
@@ -64,7 +64,7 @@ STRESS = [
     "the house is a mess but I'm too exhausted from work to clean it",
     "I have to take care of my sick mom while working a high-stress job",
     
-    # --- Category: Modern/Internet Slang & Relatable Burnout ---
+    # Modern/Internet Slang & Relatable Burnout
     "my brain has too many tabs open and half of them are frozen",
     "I am currently in the 'rot in bed' phase of burnout",
     "my social battery is at 0% and people keep trying to plug things in",
@@ -81,7 +81,7 @@ STRESS = [
     "the grind never stops and that is exactly the problem",
     "I'm just a series of survival mechanisms in a trench coat",
     
-    # --- Category: Subtle/Passive Stress Indicators ---
+    # Subtle/Passive Stress Indicators
     "I've been forgetting simple things like where I parked my car",
     "I feel like I'm constantly on edge waiting for the next disaster",
     "I snap at my partner over things as small as a dirty dish",
@@ -98,7 +98,7 @@ STRESS = [
     "I haven't felt truly relaxed in over a year",
     "I'm so overwhelmed I've started making lists of my lists",
     
-    # --- Category: Crisis-Differentiating Negations ---
+    # Crisis-Differentiating Negations
     "don't worry I'm not going to do anything stupid I'm just venting about work",
     "I'm not suicidal I just want to quit my job and move to the beach",
     "I'm not in a dark place mentally I'm just physically exhausted",
@@ -529,7 +529,7 @@ STRESS = [
     "I'm so overwhelmed i just want to escape from work",
     "the pressure to be perfect at my job is too much stress",
 
-    # --- BOUNDARY-DISTINGUISHING: Stress vs Depression/Suicidal ---
+    # BOUNDARY-DISTINGUISHING: Stress vs Depression/Suicidal
     "work deadlines are overwhelming me completely but I will get through it",
     "I can not keep up with all my responsibilities at work right now",
     "I am burnt out but I can not afford to slow down at this job",

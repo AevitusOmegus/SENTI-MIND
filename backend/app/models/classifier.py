@@ -16,9 +16,12 @@ VECTORIZER_PATH = Path(os.getenv("SENTIMIND_VECTORIZER_PATH", _data_dir / "vecto
 _UNKNOWN_RESULT = {"category": "Unknown", "confidence": 0.0, "top_categories": [], "is_ambiguous": False, "alternative_category": None, "confidence_tier": "none"}
 
 # Confidence thresholds
-CONFIDENCE_THRESHOLD = 0.35        # Below this → "Uncertain"
-AMBIGUITY_MARGIN = 0.10            # If top-2 within this margin → ambiguous
-MIN_MEANINGFUL_WORDS = 3           # Fewer → "Insufficient"
+# Below this -> "Uncertain"
+CONFIDENCE_THRESHOLD = 0.35
+# If top-2 within this margin -> ambiguous
+AMBIGUITY_MARGIN = 0.10
+# Fewer -> "Insufficient"
+MIN_MEANINGFUL_WORDS = 3
 
 
 class ClassifierNotLoadedError(RuntimeError):
@@ -26,24 +29,12 @@ class ClassifierNotLoadedError(RuntimeError):
 
 
 class ClinicalClassifier:
-    """
-    Clinical classifier for mental health text classification (v3).
-    Uses a calibrated LinearSVC model with TF-IDF features.
-
-    Improvements over v2:
-    - Shared preprocessor from app.core.preprocessing
-    - Confidence thresholding (returns 'Uncertain' for low confidence)
-    - Ambiguity detection (flags when top-2 predictions are close)
-    - Minimum content filter (returns 'Insufficient' for very short text)
-    """
-
     def __init__(self) -> None:
         self._model = None
         self._vectorizer = None
         self._classes = None
 
     def load(self) -> None:
-        """Load model and vectorizer from disk."""
         if not MODEL_PATH.exists():
             raise FileNotFoundError(f"Model artifact not found: {MODEL_PATH}")
         if not VECTORIZER_PATH.exists():
@@ -64,24 +55,15 @@ class ClinicalClassifier:
         logger.info("ClinicalClassifier v3 loaded. Classes: %s", list(self._classes))
 
     def unload(self) -> None:
-        """Unload model and free memory."""
         self._model = None
         self._vectorizer = None
         self._classes = None
 
     @property
     def is_loaded(self) -> bool:
-        """Check if model is loaded."""
         return self._model is not None and self._vectorizer is not None
 
     def predict(self, text: str) -> dict:
-        """
-        Predict clinical category for text.
-
-        Returns dict with:
-            category, confidence, top_categories,
-            is_ambiguous, alternative_category, confidence_tier
-        """
         if not self.is_loaded:
             raise ClassifierNotLoadedError("Call load() before predict().")
 

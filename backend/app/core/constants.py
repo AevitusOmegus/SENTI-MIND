@@ -1,6 +1,4 @@
-"""
-SENTI-MIND Core Constants
-"""
+
 
 # Mental Health Categories (7-class clinical classification)
 MENTAL_HEALTH_CATEGORIES = [

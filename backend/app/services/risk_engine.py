@@ -1,11 +1,3 @@
-"""
-Enhanced Risk Engine (v3)
-- Graduated keyword scoring (plan > ideation > passive)
-- Negation awareness ("I am NOT suicidal" reduces risk)
-- Temporal awareness ("I was suicidal last year" scores lower)
-- Multi-emotion integration (top-3 emotions)
-- Context-based weighting between classifier and keywords
-"""
 
 import re
 
@@ -27,7 +19,6 @@ _PAST_TENSE_RES = [re.compile(p, re.IGNORECASE) for p in PAST_TENSE_PATTERNS]
 
 
 def _is_past_tense_context(text: str) -> bool:
-    """Check if crisis keywords appear in past-tense / recovery context."""
     for pat in _PAST_TENSE_RES:
         if pat.search(text):
             return True

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 # Initialize Gemini
 genai.configure(api_key=settings.GEMINI_API_KEY if hasattr(settings, "GEMINI_API_KEY") else os.getenv("GEMINI_API_KEY"))
 
-# --- Agent Service ---
+# Agent Service
 
 class AgentService:
     def __init__(self):
@@ -37,7 +37,7 @@ class AgentService:
             "6. Suggest concrete, manageable action steps aligned with your therapeutic approaches.\n"
             "7. Close with a supportive statement offering hope.\n\n"
             
-            "CRITICAL SAFETY RULE: If you detect any high risk, suicidal ideation, or severe distress in the data or message, you MUST explicitly state that you detect a risk and strongly advise the user to seek professional mental health support immediately (e.g., dialing 988 or local emergency services).\n\n"
+            "CRITICAL SAFETY RULE: If you detect any high risk, suicidal ideation, or severe distress in the data or message, you MUST explicitly state that you detect a risk and strongly advise the user to seek professional mental health support immediately (e.g., dialing Umang at 042 3576 5951, 1122, or local emergency services). IMPORTANT EXCEPTION: If the user explicitly asks for an analysis of a SPECIFIC day or event, focus your analysis ONLY on the data relevant to that specific request. Do NOT trigger the critical safety rule for high-risk entries on OTHER days in the attached data, unless the user is asking for a general analysis or the data implies an immediate, ongoing threat.\n\n"
             
             "FORMATTING & OUTPUT RULES:\n"
             "- NEVER provide formal medical diagnoses.\n"
@@ -51,10 +51,6 @@ class AgentService:
         )
 
     async def chat(self, user_id: str, message: str, history: list = None) -> str:
-        """
-        Handles a single turn of conversation.
-        history format: [{"role": "user", "parts": ["hello"]}, {"role": "model", "parts": ["hi"]}]
-        """
         if not history:
             history = []
             
@@ -71,5 +67,5 @@ class AgentService:
             return (
                 "I'm sorry, I'm having a bit of trouble connecting right now. "
                 "Please try again in a moment. If you're in crisis, please reach out to "
-                "the **988 Suicide & Crisis Lifeline** (call or text 988) or your local emergency services."
+                "the **Umang Mental Health Helpline** (call 042 3576 5951) or your local emergency services (1122)."
             )

@@ -124,7 +124,6 @@ _MULTI_SPACE_RE = re.compile(r"\s{2,}")
 
 
 def clean_text(raw: str) -> tuple[str, list[str]]:
-    """Replace emojis with text equivalents, strip URLs, and normalise whitespace."""
     emoji_tokens: list[str] = []
 
     result = []

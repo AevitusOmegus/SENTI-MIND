@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""
-SENTI-MIND Model Training Script v4
-- Uses shared preprocessing from app.core.preprocessing
-- GridSearchCV for optimal hyperparameters
-- CalibratedClassifierCV for probability estimates
-- Stratified 10-fold cross-validation
-- Comprehensive adversarial spot-check (50+ cases)
-- Saves as sentiment_model_v3.joblib / vectorizer_v3.joblib
-"""
+
 
 import json
 import logging

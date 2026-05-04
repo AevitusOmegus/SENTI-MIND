@@ -201,10 +201,10 @@ export default function RiskBadge({
                   out to a mental health professional or crisis support service immediately.
                 </p>
                 <a 
-                  href="tel:988" 
+                  href="tel:04235765951" 
                   className="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-medical-emergency text-white rounded-lg text-sm font-medium hover:bg-medical-emergency/90 transition-colors"
                 >
-                  <span>📞</span> Call 988 Now
+                  <span>📞</span> Call Umang Now
                 </a>
               </div>
             </div>

@@ -1,6 +1,4 @@
-"""
-Screener API — GAD-2 / PHQ-2 clinical screening tools.
-"""
+
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field

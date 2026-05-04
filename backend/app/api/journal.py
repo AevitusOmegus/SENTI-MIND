@@ -1,6 +1,4 @@
-"""
-Journal API — CRUD for journal entries stored in Supabase.
-"""
+
 import logging
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
