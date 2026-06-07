@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import SentiBotFAB from "../components/SentiBotFAB";
+import WarmupBanner from "../components/WarmupBanner";
+import { useServerWarmup } from "../hooks/useServerWarmup";
 
 const NAV_LINKS = [
   {
@@ -78,6 +80,7 @@ export default function DashboardLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isCold, isWarm, elapsedSeconds } = useServerWarmup();
 
   // Emergency Quick Hide
   useEffect(() => {
@@ -264,6 +267,9 @@ export default function DashboardLayout() {
             </svg>
           </button>
         </header>
+
+        {/* Cold-start warm-up banner */}
+        <WarmupBanner isCold={isCold} isWarm={isWarm} elapsedSeconds={elapsedSeconds} />
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto scroll-smooth">

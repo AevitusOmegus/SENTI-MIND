@@ -23,11 +23,15 @@ app = FastAPI(
 
 VERCEL_ORIGIN = "https://senti-mind-mocha.vercel.app"
 
-allowed_origins = [
-    origin.strip().rstrip("/")
-    for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
-    if origin.strip()
-]
+def _parse_origins(raw: str) -> list[str]:
+    """Split on commas OR newlines so stray line-breaks in env vars don't corrupt entries."""
+    import re
+    parts = re.split(r"[,\n\r]+", raw)
+    return [p.strip().rstrip("/") for p in parts if p.strip()]
+
+allowed_origins = _parse_origins(
+    os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
+)
 if VERCEL_ORIGIN not in allowed_origins:
     allowed_origins.append(VERCEL_ORIGIN)
 
@@ -65,3 +69,10 @@ app.include_router(router, prefix="/api/v1")
 @app.get("/health")
 def health_check():
     return {"status": "ok", "allowed_origins": allowed_origins}
+
+
+@app.get("/wake")
+def wake():
+    """Lightweight keep-alive endpoint — no ML inference, returns instantly.
+    Intended to be hit every ~10 min by a cron job to prevent Render free-tier spin-down."""
+    return {"alive": True}
